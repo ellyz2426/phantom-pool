@@ -149,6 +149,42 @@ export class AchievementManager {
         icon: '💯',
         unlocked: false,
       },
+      // --- NEW ACHIEVEMENTS (Round 7) ---
+      {
+        id: 'tournament_champion',
+        name: 'Tournament Champion',
+        description: 'Win the 8-player tournament',
+        icon: '🏟️',
+        unlocked: false,
+      },
+      {
+        id: 'run_the_table',
+        name: 'Run the Table',
+        description: 'Clear all your balls without opponent playing',
+        icon: '🎰',
+        unlocked: false,
+      },
+      {
+        id: 'speed_demon',
+        name: 'Speed Demon',
+        description: 'Win a game in 8 shots or fewer',
+        icon: '⚡',
+        unlocked: false,
+      },
+      {
+        id: 'trick_master',
+        name: 'Trick Master',
+        description: 'Complete all 12 trick shots',
+        icon: '🎪',
+        unlocked: false,
+      },
+      {
+        id: 'theme_collector',
+        name: 'Theme Collector',
+        description: 'Play a game on each theme',
+        icon: '🎨',
+        unlocked: false,
+      },
     ];
   }
 
@@ -166,6 +202,10 @@ export class AchievementManager {
     mode?: string;
     matchWon?: boolean;
     spinUsed?: { back: boolean; top: boolean; english: boolean };
+    tournamentWon?: boolean;
+    ranTable?: boolean;
+    shotCount?: number;
+    themesPlayed?: number;
   }): void {
     if (context.gameCompleted) {
       this.stats.totalGames++;
@@ -226,9 +266,9 @@ export class AchievementManager {
       if (context.consecutivePockets >= 5) this.tryUnlock('streak_5');
     }
 
-    if (context.trickShotsCleared !== undefined && context.trickShotsCleared >= 8) {
+    if (context.trickShotsCleared !== undefined) {
       this.stats.tricksCompleted = context.trickShotsCleared;
-      this.tryUnlock('trickster');
+      if (context.trickShotsCleared >= 8) this.tryUnlock('trickster');
     }
 
     if (context.matchWon) {
@@ -243,6 +283,26 @@ export class AchievementManager {
       if (this.stats.backspinUsed > 0 && this.stats.topspinUsed > 0 && this.stats.curveShotsLanded > 0) {
         this.tryUnlock('spin_doctor');
       }
+    }
+
+    if (context.tournamentWon) {
+      this.tryUnlock('tournament_champion');
+    }
+
+    if (context.ranTable) {
+      this.tryUnlock('run_the_table');
+    }
+
+    if (context.shotCount !== undefined && context.gameWon && context.shotCount <= 8) {
+      this.tryUnlock('speed_demon');
+    }
+
+    if (context.trickShotsCleared !== undefined && context.trickShotsCleared >= 12) {
+      this.tryUnlock('trick_master');
+    }
+
+    if (context.themesPlayed !== undefined && context.themesPlayed >= 4) {
+      this.tryUnlock('theme_collector');
     }
 
     this.saveProgress();

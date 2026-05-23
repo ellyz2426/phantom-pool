@@ -13,7 +13,7 @@ import { TournamentManager } from './tournament';
 import { ReplaySystem } from './replay';
 
 export type GameMode = '8ball' | '9ball' | 'freeplay' | 'trickshot';
-export type GameState = 'title' | 'mode_select' | 'difficulty_select' | 'playing' | 'aiming' | 'shooting' | 'watching' | 'ball_in_hand' | 'game_over' | 'paused' | 'settings' | 'leaderboard' | 'achievements' | 'help' | 'tournament' | 'themes' | 'replay';
+export type GameState = 'title' | 'mode_select' | 'difficulty_select' | 'playing' | 'aiming' | 'shooting' | 'watching' | 'ball_in_hand' | 'game_over' | 'paused' | 'settings' | 'leaderboard' | 'achievements' | 'help' | 'tournament' | 'themes' | 'replay' | 'stats';
 export type PlayerAssignment = 'solids' | 'stripes' | 'none';
 
 export interface Player {
@@ -702,6 +702,78 @@ export class GameManager {
         targetPockets: [1, 2, 3, 4],
         maxShots: 4,
       },
+      // --- TRICK SHOTS ROUND 7 ---
+      {
+        name: 'Cross Table',
+        description: 'Bank off 2 rails to pocket the 5-ball',
+        setupFn: (bm) => {
+          bm.createBalls();
+          for (const b of bm.balls) {
+            if (b.id !== 0 && b.id !== 5) b.pocketed = true;
+          }
+          const b5 = bm.getBall(5)!;
+          b5.position.set(HW * 0.5, TABLE_HEIGHT + 0.028, HL * 0.4);
+          const cue = bm.getCueBall()!;
+          cue.position.set(-HW * 0.3, TABLE_HEIGHT + 0.028, -HL * 0.4);
+        },
+        targetPockets: [5],
+        maxShots: 2,
+      },
+      {
+        name: 'Frozen Rail',
+        description: 'Pocket the 6-ball while it sits on the rail',
+        setupFn: (bm) => {
+          bm.createBalls();
+          for (const b of bm.balls) {
+            if (b.id !== 0 && b.id !== 6) b.pocketed = true;
+          }
+          const b6 = bm.getBall(6)!;
+          // Ball frozen against the top rail
+          b6.position.set(HW * 0.2, TABLE_HEIGHT + 0.028, -HL + 0.028);
+          const cue = bm.getCueBall()!;
+          cue.position.set(0, TABLE_HEIGHT + 0.028, HL * 0.3);
+        },
+        targetPockets: [6],
+        maxShots: 2,
+      },
+      {
+        name: 'Draw Back',
+        description: 'Use backspin to draw cue ball back after pocketing the 7',
+        setupFn: (bm) => {
+          bm.createBalls();
+          for (const b of bm.balls) {
+            if (b.id !== 0 && b.id !== 7 && b.id !== 9) b.pocketed = true;
+          }
+          const b7 = bm.getBall(7)!;
+          b7.position.set(0, TABLE_HEIGHT + 0.028, -HL * 0.6);
+          const b9 = bm.getBall(9)!;
+          b9.position.set(0, TABLE_HEIGHT + 0.028, HL * 0.1);
+          const cue = bm.getCueBall()!;
+          cue.position.set(0, TABLE_HEIGHT + 0.028, -HL * 0.2);
+        },
+        targetPockets: [7, 9],
+        maxShots: 2,
+      },
+      {
+        name: 'Gauntlet',
+        description: 'Run 5 balls in sequence — no misses allowed',
+        setupFn: (bm) => {
+          bm.createBalls();
+          for (const b of bm.balls) {
+            if (b.id > 5) b.pocketed = true;
+          }
+          // Spread balls across the table
+          bm.getBall(1)!.position.set(-HW * 0.3, TABLE_HEIGHT + 0.028, -HL * 0.6);
+          bm.getBall(2)!.position.set(HW * 0.4, TABLE_HEIGHT + 0.028, -HL * 0.3);
+          bm.getBall(3)!.position.set(-HW * 0.2, TABLE_HEIGHT + 0.028, 0);
+          bm.getBall(4)!.position.set(HW * 0.3, TABLE_HEIGHT + 0.028, HL * 0.2);
+          bm.getBall(5)!.position.set(0, TABLE_HEIGHT + 0.028, HL * 0.5);
+          const cue = bm.getCueBall()!;
+          cue.position.set(0, TABLE_HEIGHT + 0.028, HL * 0.7);
+        },
+        targetPockets: [1, 2, 3, 4, 5],
+        maxShots: 5,
+      },
     ];
   }
 
@@ -791,6 +863,20 @@ export class GameManager {
   // Themes
   showThemes(): void {
     this.state = 'themes' as GameState;
+  }
+
+  // Stats
+  showStats(): void {
+    this.state = 'stats' as GameState;
+  }
+
+  // Quick rematch (restarts with same mode and settings)
+  quickRematch(): void {
+    if (this.isTournamentGame) {
+      this.state = 'tournament' as GameState;
+    } else {
+      this.startGame(this.mode);
+    }
   }
 
   loadStats(): void {

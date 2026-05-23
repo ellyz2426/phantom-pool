@@ -42,6 +42,7 @@ interface UIEntities {
   helpEntity: any;
   themesEntity: any;
   tournamentEntity: any;
+  statsEntity: any;
 }
 
 export interface UISystem {
@@ -199,6 +200,16 @@ export function setupUI(world: World, game: GameManager, audio: AudioManager, ca
   });
   entities.tournamentEntity = tournamentEntity;
 
+  // ---- STATS PANEL (world-space) ----
+  const statsEntity = world.createTransformEntity(undefined, { persistent: true });
+  statsEntity.object3D.position.set(0, 1.6, -1.8);
+  statsEntity.addComponent(PanelUI, {
+    config: '/ui/stats.json',
+    maxWidth: 1.0,
+    maxHeight: 1.4,
+  });
+  entities.statsEntity = statsEntity;
+
   // ---- MESSAGE TOAST (head-following, top center) ----
   const messageEntity = world.createTransformEntity(undefined, { persistent: true });
   messageEntity.addComponent(PanelUI, {
@@ -271,6 +282,7 @@ export function setupUI(world: World, game: GameManager, audio: AudioManager, ca
     setVisible(entities.helpEntity, state === 'help' as GameState);
     setVisible(entities.themesEntity, state === 'themes' as GameState);
     setVisible(entities.tournamentEntity, state === 'tournament' as GameState);
+    setVisible(entities.statsEntity, state === 'stats' as GameState);
     setVisible(entities.messageEntity, game.message !== '');
     setVisible(entities.cameraEntity, isPlaying);
 
@@ -329,6 +341,11 @@ export function setupUI(world: World, game: GameManager, audio: AudioManager, ca
     // Update tournament panel
     if (state === 'tournament' as GameState) {
       updateTournament(game.tournament);
+    }
+
+    // Update stats panel
+    if (state === 'stats' as GameState) {
+      updateStatsPanel(entities.statsEntity, game.achievements);
     }
 
     lastState = state;
@@ -435,6 +452,7 @@ function wireEvents(entities: UIEntities, game: GameManager, audio: AudioManager
       game.state = 'tournament' as any;
     });
     titleDoc.getElementById('themes-btn')?.addEventListener('click', () => { game.state = 'themes' as any; });
+    titleDoc.getElementById('stats-btn')?.addEventListener('click', () => { game.state = 'stats' as any; });
   }
 
   // Mode select buttons
@@ -560,6 +578,18 @@ function wireEvents(entities: UIEntities, game: GameManager, audio: AudioManager
     themeDoc.getElementById('theme-purple')?.addEventListener('click', () => themeManager.setTheme('purple'));
     themeDoc.getElementById('back-btn')?.addEventListener('click', () => game.showTitle());
   }
+
+  // Stats panel buttons
+  const statsDoc = getDoc(entities.statsEntity);
+  if (statsDoc) {
+    statsDoc.getElementById('back-btn')?.addEventListener('click', () => game.showTitle());
+  }
+
+  // Quick rematch button on game over
+  const goDoc2 = getDoc(entities.gameOverEntity);
+  if (goDoc2) {
+    goDoc2.getElementById('rematch-btn')?.addEventListener('click', () => game.quickRematch());
+  }
 }
 
 function updateHUD(entity: any, game: GameManager, ballManager: BallManager, cue: CueStick) {
@@ -668,7 +698,7 @@ function updateAchievementsPanel(entity: any, achievements: AchievementManager) 
 
   setText(doc.getElementById('ach-counter'), `${achievements.getUnlockedCount()} / ${achievements.getTotalCount()}`);
 
-  for (let i = 0; i < achievements.achievements.length && i < 15; i++) {
+  for (let i = 0; i < achievements.achievements.length && i < 20; i++) {
     const ach = achievements.achievements[i];
     if (ach.unlocked) {
       setText(doc.getElementById(`ach-i-${i}`), ach.icon);
@@ -680,4 +710,29 @@ function updateAchievementsPanel(entity: any, achievements: AchievementManager) 
       setText(doc.getElementById(`ach-d-${i}`), '???');
     }
   }
+}
+
+function updateStatsPanel(entity: any, achievements: AchievementManager) {
+  const doc = getDoc(entity);
+  if (!doc) return;
+
+  const s = achievements.stats;
+  const winRate = s.totalGames > 0 ? Math.round((s.gamesWon / s.totalGames) * 100) : 0;
+
+  setText(doc.getElementById('stat-games'), `${s.totalGames}`);
+  setText(doc.getElementById('stat-wins'), `${s.gamesWon}`);
+  setText(doc.getElementById('stat-winrate'), `${winRate}%`);
+  setText(doc.getElementById('stat-pocketed'), `${s.totalPocketed}`);
+  setText(doc.getElementById('stat-streak'), `${s.longestStreak}`);
+  setText(doc.getElementById('stat-combos'), `${s.comboShots}`);
+  setText(doc.getElementById('stat-clean'), `${s.perfectGames}`);
+  setText(doc.getElementById('stat-easy'), `${s.easyWins}`);
+  setText(doc.getElementById('stat-medium'), `${s.mediumWins}`);
+  setText(doc.getElementById('stat-hard'), `${s.hardWins}`);
+  setText(doc.getElementById('stat-matches'), `${s.matchesWon}`);
+  setText(doc.getElementById('stat-back'), `${s.backspinUsed}`);
+  setText(doc.getElementById('stat-top'), `${s.topspinUsed}`);
+  setText(doc.getElementById('stat-english'), `${s.curveShotsLanded}`);
+  setText(doc.getElementById('stat-tricks'), `${s.tricksCompleted}`);
+  setText(doc.getElementById('stat-ach'), `${achievements.getUnlockedCount()} / ${achievements.getTotalCount()}`);
 }

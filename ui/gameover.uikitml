@@ -62,6 +62,9 @@
   <button id="replay-btn" class="go-btn" cursor="pointer">
     <span class="btn-text">PLAY AGAIN</span>
   </button>
+  <button id="rematch-btn" class="go-btn" cursor="pointer">
+    <span class="btn-text">⚡ QUICK REMATCH</span>
+  </button>
   <button id="watch-replay-btn" class="go-btn" cursor="pointer">
     <span class="btn-text">📹 REPLAY LAST SHOT</span>
   </button>

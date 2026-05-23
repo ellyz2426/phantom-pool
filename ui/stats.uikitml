@@ -1,0 +1,165 @@
+<!-- Stats Panel — Comprehensive gameplay statistics -->
+<style>
+  .stats-panel {
+    display: flex;
+    flex-direction: column;
+    padding: 2;
+    background-color: rgba(0, 8, 20, 0.92);
+    border-color: #00ccff;
+    border-width: 0.1;
+    border-radius: 1;
+    gap: 1;
+  }
+  .stats-title {
+    font-size: 3;
+    color: #00ffdd;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1;
+  }
+  .stat-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3;
+    margin-bottom: 0.8;
+  }
+  .section-header {
+    font-size: 1.8;
+    color: #ffcc00;
+    font-weight: bold;
+  }
+  .stat-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-left: 0.5;
+    padding-right: 0.5;
+  }
+  .stat-label {
+    font-size: 1.4;
+    color: #88aacc;
+  }
+  .stat-value {
+    font-size: 1.4;
+    color: #ffffff;
+    font-weight: bold;
+  }
+  .divider {
+    height: 0.05;
+    background-color: rgba(0, 200, 255, 0.2);
+    margin-top: 0.5;
+    margin-bottom: 0.5;
+  }
+  .back-btn {
+    padding: 1;
+    background-color: rgba(0, 180, 255, 0.2);
+    border-color: #00bbff;
+    border-width: 0.05;
+    border-radius: 0.5;
+    margin-top: 1;
+    cursor: pointer;
+  }
+  .back-text {
+    font-size: 1.8;
+    color: #00ddff;
+    font-weight: bold;
+    text-align: center;
+  }
+</style>
+<div class="stats-panel">
+  <span class="stats-title">📊 STATISTICS</span>
+
+  <div class="stat-section">
+    <span class="section-header">🎱 General</span>
+    <div class="stat-row">
+      <span class="stat-label">Games Played</span>
+      <span id="stat-games" class="stat-value">0</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Games Won</span>
+      <span id="stat-wins" class="stat-value">0</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Win Rate</span>
+      <span id="stat-winrate" class="stat-value">0%</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Total Balls Pocketed</span>
+      <span id="stat-pocketed" class="stat-value">0</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="stat-section">
+    <span class="section-header">🔥 Streaks & Combos</span>
+    <div class="stat-row">
+      <span class="stat-label">Longest Streak</span>
+      <span id="stat-streak" class="stat-value">0</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Combo Shots</span>
+      <span id="stat-combos" class="stat-value">0</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Clean Games (No Fouls)</span>
+      <span id="stat-clean" class="stat-value">0</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="stat-section">
+    <span class="section-header">🤖 VS CPU</span>
+    <div class="stat-row">
+      <span class="stat-label">Easy Wins</span>
+      <span id="stat-easy" class="stat-value">0</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Medium Wins</span>
+      <span id="stat-medium" class="stat-value">0</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Hard Wins</span>
+      <span id="stat-hard" class="stat-value">0</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Matches Won</span>
+      <span id="stat-matches" class="stat-value">0</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="stat-section">
+    <span class="section-header">🌀 Spin & Tricks</span>
+    <div class="stat-row">
+      <span class="stat-label">Backspin Shots</span>
+      <span id="stat-back" class="stat-value">0</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Topspin Shots</span>
+      <span id="stat-top" class="stat-value">0</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">English Shots</span>
+      <span id="stat-english" class="stat-value">0</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Tricks Completed</span>
+      <span id="stat-tricks" class="stat-value">0</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="stat-section">
+    <span class="section-header">🏆 Achievements</span>
+    <div class="stat-row">
+      <span class="stat-label">Unlocked</span>
+      <span id="stat-ach" class="stat-value">0 / 20</span>
+    </div>
+  </div>
+
+  <button id="back-btn" class="back-btn"><span class="back-text">← BACK</span></button>
+</div>

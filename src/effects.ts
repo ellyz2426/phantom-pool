@@ -180,6 +180,45 @@ export class EffectsManager {
     this.pocketFlashes.push({ mesh, life: 0.3 });
   }
 
+  // Rail sparkle/diamond effect when ball bounces off cushion
+  spawnRailSparkle(position: Vector3, speed: number): void {
+    const count = Math.min(Math.floor(speed * 3) + 3, 10);
+    const intensity = Math.min(speed / 2.5, 1.0);
+
+    for (let i = 0; i < count; i++) {
+      // Diamond-shaped sparkles along the rail
+      const geo = new ConeGeometry(0.004 + Math.random() * 0.003, 0.012, 4);
+      const colors = [0x00ffdd, 0xffcc00, 0x00aaff, 0xff8800];
+      const hue = colors[Math.floor(Math.random() * colors.length)];
+      const mat = new MeshBasicMaterial({
+        color: hue,
+        transparent: true,
+        opacity: 0.9 * intensity,
+        blending: AdditiveBlending,
+      });
+      const mesh = new Mesh(geo, mat);
+      mesh.position.copy(position);
+      mesh.position.y += 0.01;
+      mesh.rotation.z = Math.random() * Math.PI;
+      this.effectsGroup.add(mesh);
+
+      const angle = Math.random() * Math.PI * 2;
+      const upward = 0.5 + Math.random() * 1.0;
+      const spread = (0.2 + Math.random() * 0.4) * intensity;
+
+      this.particles.push({
+        mesh,
+        velocity: new Vector3(
+          Math.cos(angle) * spread,
+          upward * 0.15,
+          Math.sin(angle) * spread
+        ),
+        life: 0.2 + Math.random() * 0.25,
+        maxLife: 0.2 + Math.random() * 0.25,
+      });
+    }
+  }
+
   // Cue ball ghost trail for high-speed shots
   spawnCueTrail(position: Vector3): void {
     this.spawnTrailPoint(position, 0x88ccff);

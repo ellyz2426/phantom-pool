@@ -198,15 +198,19 @@ export class PhysicsEngine {
     }
   }
 
+  // Callback for rail sparkle effects
+  onRailHit: ((pos: Vector3, speed: number) => void) | null = null;
+
   private resolveRailCollision(ball: PoolBall, audio: AudioManager): void {
     let hit = false;
+    const contactPos = ball.position.clone();
 
     // Left rail
     if (ball.position.x - BALL_RADIUS < -HW) {
-      // Check if near a pocket
       if (!this.isNearPocket(ball.position)) {
         ball.position.x = -HW + BALL_RADIUS;
         ball.velocity.x = -ball.velocity.x * RAIL_RESTITUTION;
+        contactPos.x = -HW;
         hit = true;
       }
     }
@@ -215,6 +219,7 @@ export class PhysicsEngine {
       if (!this.isNearPocket(ball.position)) {
         ball.position.x = HW - BALL_RADIUS;
         ball.velocity.x = -ball.velocity.x * RAIL_RESTITUTION;
+        contactPos.x = HW;
         hit = true;
       }
     }
@@ -223,6 +228,7 @@ export class PhysicsEngine {
       if (!this.isNearPocket(ball.position)) {
         ball.position.z = -HL + BALL_RADIUS;
         ball.velocity.z = -ball.velocity.z * RAIL_RESTITUTION;
+        contactPos.z = -HL;
         hit = true;
       }
     }
@@ -231,12 +237,17 @@ export class PhysicsEngine {
       if (!this.isNearPocket(ball.position)) {
         ball.position.z = HL - BALL_RADIUS;
         ball.velocity.z = -ball.velocity.z * RAIL_RESTITUTION;
+        contactPos.z = HL;
         hit = true;
       }
     }
 
     if (hit) {
-      audio.playRailHit(ball.velocity.length());
+      const speed = ball.velocity.length();
+      audio.playRailHit(speed);
+      if (this.onRailHit) {
+        this.onRailHit(contactPos, speed);
+      }
     }
   }
 

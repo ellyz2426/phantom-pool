@@ -71,6 +71,9 @@
   <button id="themes-btn" class="menu-button" cursor="pointer">
     <span class="btn-text">🎨 THEMES</span>
   </button>
+  <button id="stats-btn" class="menu-button" cursor="pointer">
+    <span class="btn-text">📊 STATS</span>
+  </button>
   <button id="help-btn" class="menu-button" cursor="pointer">
     <span class="btn-text">HELP</span>
   </button>

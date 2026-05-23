@@ -123,6 +123,13 @@ async function main() {
     audioManager.playAchievement();
   };
 
+  // Wire rail sparkle effects to physics
+  physics.onRailHit = (pos, speed) => {
+    if (speed > 0.5) {
+      effects.spawnRailSparkle(pos, speed);
+    }
+  };
+
   // Wire theme changes
   themeManager.onChange((theme: ThemeColors) => {
     ui.updateThemeLabel(theme.name);
