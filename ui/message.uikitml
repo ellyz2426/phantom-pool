@@ -1,0 +1,23 @@
+<style>
+  .message-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.6;
+    padding-bottom: 0.6;
+    padding-left: 2;
+    padding-right: 2;
+    background-color: rgba(0, 10, 20, 0.85);
+    border-color: #00ffcc;
+    border-width: 0.08;
+    border-radius: 0.5;
+  }
+  .message-text {
+    font-size: 2;
+    color: #00ffdd;
+    font-weight: bold;
+  }
+</style>
+<div class="message-panel">
+  <span id="message-text" class="message-text">BREAK!</span>
+</div>

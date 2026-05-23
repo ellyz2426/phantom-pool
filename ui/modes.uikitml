@@ -1,0 +1,89 @@
+<style>
+  .modes-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 2;
+    padding-bottom: 2;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(0, 5, 15, 0.92);
+    border-color: #00ddff;
+    border-width: 0.12;
+    border-radius: 1.5;
+    gap: 1;
+  }
+  .header {
+    font-size: 2.5;
+    color: #00ffdd;
+    font-weight: bold;
+  }
+  .mode-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 0.6;
+    padding-bottom: 0.6;
+    padding-left: 2.5;
+    padding-right: 2.5;
+    background-color: rgba(0, 40, 60, 0.6);
+    border-color: #00aacc;
+    border-width: 0.06;
+    border-radius: 0.5;
+    cursor: pointer;
+    min-width: 16;
+  }
+  .mode-btn:hover {
+    background-color: rgba(0, 70, 100, 0.8);
+    border-color: #00ffdd;
+  }
+  .mode-name {
+    font-size: 1.8;
+    color: #00ddff;
+    font-weight: bold;
+  }
+  .mode-desc {
+    font-size: 1;
+    color: #5588aa;
+  }
+  .back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.5;
+    padding-bottom: 0.5;
+    padding-left: 2;
+    padding-right: 2;
+    background-color: rgba(60, 20, 20, 0.5);
+    border-color: #ff4444;
+    border-width: 0.06;
+    border-radius: 0.4;
+    cursor: pointer;
+  }
+  .back-text {
+    font-size: 1.4;
+    color: #ff6666;
+  }
+</style>
+<div class="modes-panel">
+  <span class="header">SELECT MODE</span>
+  <button id="mode-8ball" class="mode-btn" cursor="pointer">
+    <span class="mode-name">8-BALL</span>
+    <span class="mode-desc">Classic pool - pocket your group then the 8</span>
+  </button>
+  <button id="mode-9ball" class="mode-btn" cursor="pointer">
+    <span class="mode-name">9-BALL</span>
+    <span class="mode-desc">Hit lowest first - pocket the 9 to win</span>
+  </button>
+  <button id="mode-freeplay" class="mode-btn" cursor="pointer">
+    <span class="mode-name">FREE PLAY</span>
+    <span class="mode-desc">Practice shots with no rules</span>
+  </button>
+  <button id="mode-trickshot" class="mode-btn" cursor="pointer">
+    <span class="mode-name">TRICK SHOTS</span>
+    <span class="mode-desc">Complete precision challenges</span>
+  </button>
+  <button id="back-btn" class="back-btn" cursor="pointer">
+    <span class="back-text">BACK</span>
+  </button>
+</div>

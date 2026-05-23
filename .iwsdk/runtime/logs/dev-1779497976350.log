@@ -1,0 +1,222 @@
+
+> void-archer@1.4.0 dev:runtime
+> vite
+
+🔧 IWSDK Dev Configuration:
+  - Device: metaQuest3
+  - SEM: disabled
+  - AI: enabled (agent mode)
+  - Activation: localhost
+  - UA exception: enabled
+  - Inject on build: false
+[compile-uikitml] Plugin initialized with options: {
+  sourceDir: 'ui',
+  outputDir: 'public/ui',
+  watch: true,
+  verbose: true,
+  include: /\.uikitml$/
+}
+[compile-uikitml] Vite command: serve
+[compile-uikitml] Vite mode: development
+🔌 IWSDK-MCP: WebSocket endpoint registered at /__iwer_mcp
+🔍 UIKitML watcher monitoring: /home/hatch/workspace/void-archer/ui
+🚀 Generating initial UIKitML files for dev server...
+[compile-uikitml] Found 9 .uikitml files to process
+[compile-uikitml] Reading file: /home/hatch/workspace/void-archer/ui/achievements.uikitml
+[compile-uikitml] File content length: 3643 characters
+[compile-uikitml] Real parse result for achievements.uikitml:
+[compile-uikitml] Element type: container
+[compile-uikitml] Classes found: 9
+[compile-uikitml] Ranges found: 53
+[compile-uikitml] ✅ Compiled: achievements.uikitml -> achievements.json
+[compile-uikitml] Reading file: /home/hatch/workspace/void-archer/ui/hud.uikitml
+[compile-uikitml] File content length: 2079 characters
+[compile-uikitml] Real parse result for hud.uikitml:
+[compile-uikitml] Element type: container
+[compile-uikitml] Classes found: 11
+[compile-uikitml] Ranges found: 35
+[compile-uikitml] ✅ Compiled: hud.uikitml -> hud.json
+[compile-uikitml] Reading file: /home/hatch/workspace/void-archer/ui/leaderboard.uikitml
+[compile-uikitml] File content length: 3029 characters
+[compile-uikitml] Real parse result for leaderboard.uikitml:
+[compile-uikitml] Element type: container
+[compile-uikitml] Classes found: 11
+[compile-uikitml] Ranges found: 40
+[compile-uikitml] ✅ Compiled: leaderboard.uikitml -> leaderboard.json
+[compile-uikitml] Reading file: /home/hatch/workspace/void-archer/ui/modes.uikitml
+[compile-uikitml] File content length: 3617 characters
+[compile-uikitml] Real parse result for modes.uikitml:
+[compile-uikitml] Element type: container
+[compile-uikitml] Classes found: 13
+[compile-uikitml] Ranges found: 42
+[compile-uikitml] ✅ Compiled: modes.uikitml -> modes.json
+[compile-uikitml] Reading file: /home/hatch/workspace/void-archer/ui/pause.uikitml
+[compile-uikitml] File content length: 1249 characters
+[compile-uikitml] Real parse result for pause.uikitml:
+[compile-uikitml] Element type: container
+[compile-uikitml] Classes found: 4
+[compile-uikitml] Ranges found: 8
+[compile-uikitml] ✅ Compiled: pause.uikitml -> pause.json
+[compile-uikitml] Reading file: /home/hatch/workspace/void-archer/ui/results.uikitml
+[compile-uikitml] File content length: 2418 characters
+[compile-uikitml] Real parse result for results.uikitml:
+[compile-uikitml] Element type: container
+[compile-uikitml] Classes found: 12
+[compile-uikitml] Ranges found: 35
+[compile-uikitml] ✅ Compiled: results.uikitml -> results.json
+[compile-uikitml] Reading file: /home/hatch/workspace/void-archer/ui/settings.uikitml
+[compile-uikitml] File content length: 2997 characters
+[compile-uikitml] Real parse result for settings.uikitml:
+[compile-uikitml] Element type: container
+[compile-uikitml] Classes found: 12
+[compile-uikitml] Ranges found: 37
+[compile-uikitml] ✅ Compiled: settings.uikitml -> settings.json
+[compile-uikitml] Reading file: /home/hatch/workspace/void-archer/ui/stats.uikitml
+[compile-uikitml] File content length: 2986 characters
+[compile-uikitml] Real parse result for stats.uikitml:
+[compile-uikitml] Element type: container
+[compile-uikitml] Classes found: 10
+[compile-uikitml] Ranges found: 44
+[compile-uikitml] ✅ Compiled: stats.uikitml -> stats.json
+[compile-uikitml] Reading file: /home/hatch/workspace/void-archer/ui/title.uikitml
+[compile-uikitml] File content length: 2133 characters
+[compile-uikitml] Real parse result for title.uikitml:
+[compile-uikitml] Element type: container
+[compile-uikitml] Classes found: 9
+[compile-uikitml] Ranges found: 25
+[compile-uikitml] ✅ Compiled: title.uikitml -> title.json
+👁️  UIKitML file watcher started - monitoring for changes...
+🚀 IWSDK Dev: Starting injection bundle generation...
+🔄 Loading pre-built IWSDK injection bundle...
+👁️  UIKitML file watcher ready
+✅ IWSDK injection bundle loaded and configured (1116.7KB)
+✅ IWSDK Dev: Injection bundle ready
+
+  VITE v7.3.2  ready in 1550 ms
+
+  ➜  Local:   https://localhost:8081/
+  ➜  Network: https://198.19.0.2:8081/
+[RAG-MCP] Server not found, skipping warmup
+💉 IWSDK Dev: Injecting runtime script into HTML
+[browser:debug] [vite] connecting...
+[browser:log] [IWSDK Dev] Configuration: {device: metaQuest3, activation: localhost, verbose: true, sem: null, ai: Object}
+[browser:log] [IWSDK Dev] 🎯 Activating IWER runtime...
+[browser:log] [IWSDK Dev] 📱 Using device configuration: metaQuest3
+[browser:log] [IWSDK Dev] 🔌 Initializing MCP client...
+[browser:log] [IWSDK-MCP] Connecting to: wss://localhost:8081/__iwer_mcp
+[browser:log] [IWSDK Dev] ✅ MCP client initialized
+[browser:log] [IWSDK Dev] ✅ Runtime activated successfully!
+[browser:debug] [vite] connected.
+[IWSDK-MCP] WebSocket upgrade request received
+[IWSDK-MCP] Client connected
+[browser:log] [IWSDK-MCP] Connected
+[IWSDK-MCP] Message received: {"type":"iwsdk_browser_hello","tabId":"tab-mphn5ipy-4djqzc","tabGeneration":1}
+[browser:warning] THREE.WARNING: Multiple instances of Three.js being imported.
+[browser:log]                                                  
+▄▄▄▄▄▄  ▄▄      ▄▄   ▄▄▄▄    ▄▄▄▄▄     ▄▄   ▄▄▄ 
+▀▀██▀▀  ██      ██ ▄█▀▀▀▀█   ██▀▀▀██   ██  ██▀  
+  ██    ▀█▄ ██ ▄█▀ ██▄       ██    ██  ██▄██    
+  ██     ██ ██ ██   ▀████▄   ██    ██  █████    
+  ██     ███▀▀███       ▀██  ██    ██  ██  ██▄  
+▄▄██▄▄   ███  ███  █▄▄▄▄▄█▀  ██▄▄▄██   ██   ██▄ 
+▀▀▀▀▀▀   ▀▀▀  ▀▀▀   ▀▀▀▀▀    ▀▀▀▀▀     ▀▀    ▀▀                                                
+===============================================
+Immersive Web SDK v0.3.1
+Three.js r181
+EliCS v3.4.2
+[browser:warning] The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio
+[browser:warning] The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio
+[browser:warning] The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio
+[browser:warning] The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio
+[browser:warning] [.WebGL-0x239400143a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[IWSDK-MCP] WebSocket upgrade request received
+[IWSDK-MCP] Client connected
+[IWSDK-MCP] Message received: {"id":"1779497988049-4541e23320cdf","method":"screenshot","params":{}}
+[browser:warning] [.WebGL-0x239400143a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[IWSDK-MCP] Client disconnected
+[browser:warning] [.WebGL-0x239400143a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+🖥️  IWSDK: Headless browser launched
+[browser:warning] [.WebGL-0x239400143a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)
+[browser:warning] Missing glyph info for character "·"
+[browser:warning] Missing glyph info for character "·"
+[browser:warning] Missing glyph info for character "·"
+[browser:warning] Missing glyph info for character "·"
+[browser:warning] Missing glyph info for character "·"
+[browser:warning] Missing glyph info for character "·"
+[browser:warning] Missing glyph info for character "·"
+[browser:warning] Missing glyph info for character "·"
+[browser:warning] Missing glyph info for character "·"
+[IWSDK-MCP] WebSocket upgrade request received
+[IWSDK-MCP] Client connected
+[IWSDK-MCP] Message received: {"id":"1779497996541-959d5bcafb7a1","method":"screenshot","params":{}}
+[IWSDK-MCP] Client disconnected
+[IWSDK-MCP] WebSocket upgrade request received
+[IWSDK-MCP] Client connected
+[IWSDK-MCP] Message received: {"id":"1779498006989-2be9cb122acaf","method":"accept_session","params":{}}
+[IWSDK-MCP] Message received: {"id":"1779498006989-2be9cb122acaf","result":{"success":true},"_tabId":"tab-mphn5ipy-4djqzc","_tabGe
+[MCP-IWER] Response for 1779498006989-2be9cb122acaf forwarded (first-wins)
+[browser:debug] [IWSDK-MCP] Received: accept_session {}
+[browser:debug] [IWSDK-MCP] Result: {success: true}
+[IWSDK-MCP] Client disconnected
+[IWSDK-MCP] WebSocket upgrade request received
+[IWSDK-MCP] Client connected
+[IWSDK-MCP] Message received: {"id":"1779498013037-852139a99d545","method":"get_session_status","params":{}}
+[IWSDK-MCP] Message received: {"id":"1779498013037-852139a99d545","result":{"deviceName":"Meta Quest 3","isRuntimeInstalled":true,
+[MCP-IWER] Response for 1779498013037-852139a99d545 forwarded (first-wins)
+[browser:debug] [IWSDK-MCP] Received: get_session_status {}
+[browser:debug] [IWSDK-MCP] Result: {deviceName: Meta Quest 3, isRuntimeInstalled: true, sessionActive: true, sessionOffered: false, sessionMode: undefined}
+[IWSDK-MCP] Client disconnected
+[IWSDK-MCP] WebSocket upgrade request received
+[IWSDK-MCP] Client connected
+[IWSDK-MCP] Message received: {"id":"1779498014243-8ec1a6b65602d","method":"set_input_mode","params":{"mode":"controller"}}
+[browser:debug] [IWSDK-MCP] Received: set_input_mode {mode: controller}
+[IWSDK-MCP] Message received: {"id":"1779498014243-8ec1a6b65602d","result":{"mode":"controller","activeDevices":["controller-left"
+[MCP-IWER] Response for 1779498014243-8ec1a6b65602d forwarded (first-wins)
+[browser:debug] [IWSDK-MCP] Result: {mode: controller, activeDevices: Array(2)}
+[IWSDK-MCP] Client disconnected
+[IWSDK-MCP] WebSocket upgrade request received
+[IWSDK-MCP] Client connected
+[IWSDK-MCP] Message received: {"id":"1779498015685-1f3e3ba644229","method":"set_connected","params":{"device":"controller-right","
+[browser:debug] [IWSDK-MCP] Received: set_connected {device: controller-right, connected: true}
+[IWSDK-MCP] Message received: {"id":"1779498015685-1f3e3ba644229","result":{"device":"controller-right","connected":true},"_tabId"
+[MCP-IWER] Response for 1779498015685-1f3e3ba644229 forwarded (first-wins)
+[browser:debug] [IWSDK-MCP] Result: {device: controller-right, connected: true}
+[IWSDK-MCP] Client disconnected
+[IWSDK-MCP] WebSocket upgrade request received
+[IWSDK-MCP] Client connected
+[IWSDK-MCP] Message received: {"id":"1779498017047-ee7206ce329fa","method":"set_connected","params":{"device":"controller-left","c
+[browser:debug] [IWSDK-MCP] Received: set_connected {device: controller-left, connected: true}
+[browser:debug] [IWSDK-MCP] Result: {device: controller-left, connected: true}
+[IWSDK-MCP] Message received: {"id":"1779498017047-ee7206ce329fa","result":{"device":"controller-left","connected":true},"_tabId":
+[MCP-IWER] Response for 1779498017047-ee7206ce329fa forwarded (first-wins)
+[IWSDK-MCP] Client disconnected
+[IWSDK-MCP] WebSocket upgrade request received
+[IWSDK-MCP] Client connected
+[IWSDK-MCP] Message received: {"id":"1779498021417-aec9cab72addd","method":"screenshot","params":{}}
+[IWSDK-MCP] Client disconnected
+[IWSDK-MCP] WebSocket upgrade request received
+[IWSDK-MCP] Client connected
+[IWSDK-MCP] Message received: {"id":"1779498038390-466066db6610a","method":"end_session","params":{}}
+[browser:debug] [IWSDK-MCP] Received: end_session {}
+[IWSDK-MCP] Message received: {"id":"1779498038390-466066db6610a","result":{"success":true},"_tabId":"tab-mphn5ipy-4djqzc","_tabGe
+[MCP-IWER] Response for 1779498038390-466066db6610a forwarded (first-wins)
+[browser:warning] THREE.WebGLRenderer: Can't change size while VR device is presenting.
+[browser:debug] [IWSDK-MCP] Result: {success: true}
+[IWSDK-MCP] Client disconnected
+[IWSDK-MCP] Client disconnected
+
+🥽 IWSDK Dev Summary (Development):
+  - Device: metaQuest3
+  - Runtime injected: 1116.7KB
+  - Activation mode: localhost
+  - AI: agent mode (WebSocket at /__iwer_mcp)
+  - Note: Runtime only activates on localhost/local networks
+
+
+🥽 IWSDK Dev Summary (Development):
+  - Device: metaQuest3
+  - Runtime injected: 1116.7KB
+  - Activation mode: localhost
+  - AI: agent mode (WebSocket at /__iwer_mcp)
+  - Note: Runtime only activates on localhost/local networks
+

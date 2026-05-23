@@ -1,0 +1,81 @@
+<style>
+  .pause-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 2;
+    padding-bottom: 2;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(0, 5, 15, 0.95);
+    border-color: #ffaa00;
+    border-width: 0.12;
+    border-radius: 1;
+    gap: 1.5;
+  }
+  .pause-title {
+    font-size: 3;
+    color: #ffaa00;
+    font-weight: bold;
+  }
+  .pause-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.7;
+    padding-bottom: 0.7;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(0, 50, 80, 0.6);
+    border-color: #00bbdd;
+    border-width: 0.06;
+    border-radius: 0.5;
+    cursor: pointer;
+    min-width: 14;
+  }
+  .pause-btn:hover {
+    background-color: rgba(0, 80, 120, 0.8);
+  }
+  .quit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.7;
+    padding-bottom: 0.7;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(60, 20, 20, 0.5);
+    border-color: #ff4444;
+    border-width: 0.06;
+    border-radius: 0.5;
+    cursor: pointer;
+    min-width: 14;
+  }
+  .quit-btn:hover {
+    background-color: rgba(100, 30, 30, 0.7);
+  }
+  .btn-text {
+    font-size: 1.8;
+    color: #00ddff;
+    font-weight: bold;
+  }
+  .quit-text {
+    font-size: 1.8;
+    color: #ff6666;
+    font-weight: bold;
+  }
+  .hint {
+    font-size: 1;
+    color: #446677;
+  }
+</style>
+<div class="pause-panel">
+  <span class="pause-title">PAUSED</span>
+  <button id="resume-btn" class="pause-btn" cursor="pointer">
+    <span class="btn-text">RESUME</span>
+  </button>
+  <button id="quit-btn" class="quit-btn" cursor="pointer">
+    <span class="quit-text">QUIT</span>
+  </button>
+  <span class="hint">ESC / B button</span>
+</div>

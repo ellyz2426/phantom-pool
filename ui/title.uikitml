@@ -1,0 +1,66 @@
+<style>
+  .title-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 3;
+    padding-bottom: 3;
+    padding-left: 4;
+    padding-right: 4;
+    background-color: rgba(0, 5, 15, 0.92);
+    border-color: #00ddff;
+    border-width: 0.15;
+    border-radius: 1.5;
+    gap: 1.5;
+  }
+  .title-text {
+    font-size: 4;
+    color: #00ffdd;
+    font-weight: bold;
+  }
+  .subtitle-text {
+    font-size: 1.5;
+    color: #5588aa;
+  }
+  .menu-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.8;
+    padding-bottom: 0.8;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(0, 50, 80, 0.6);
+    border-color: #00bbdd;
+    border-width: 0.08;
+    border-radius: 0.5;
+    cursor: pointer;
+    min-width: 18;
+  }
+  .menu-button:hover {
+    background-color: rgba(0, 80, 120, 0.8);
+  }
+  .btn-text {
+    font-size: 2;
+    color: #00ddff;
+    font-weight: bold;
+  }
+  .controls-hint {
+    font-size: 1;
+    color: #446677;
+  }
+</style>
+<div class="title-panel">
+  <span class="title-text">PHANTOM POOL</span>
+  <span class="subtitle-text">HOLODECK BILLIARDS</span>
+  <button id="play-btn" class="menu-button" cursor="pointer">
+    <span class="btn-text">PLAY</span>
+  </button>
+  <button id="settings-btn" class="menu-button" cursor="pointer">
+    <span class="btn-text">SETTINGS</span>
+  </button>
+  <button id="leaderboard-btn" class="menu-button" cursor="pointer">
+    <span class="btn-text">LEADERBOARD</span>
+  </button>
+  <span class="controls-hint">VR: Trigger to select | Browser: Click</span>
+</div>

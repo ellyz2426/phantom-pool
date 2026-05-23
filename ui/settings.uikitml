@@ -1,0 +1,85 @@
+<style>
+  .settings-panel {
+    display: flex;
+    flex-direction: column;
+    padding-top: 2;
+    padding-bottom: 2;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(0, 5, 15, 0.95);
+    border-color: #00ddff;
+    border-width: 0.12;
+    border-radius: 1.5;
+    gap: 1;
+  }
+  .header {
+    font-size: 2.5;
+    color: #00ffdd;
+    font-weight: bold;
+  }
+  .section-title {
+    font-size: 1.5;
+    color: #ffaa00;
+    font-weight: bold;
+  }
+  .setting-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 2;
+  }
+  .label {
+    font-size: 1.2;
+    color: #88aacc;
+  }
+  .value {
+    font-size: 1.2;
+    color: #00ddff;
+    font-weight: bold;
+  }
+  .back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.5;
+    padding-bottom: 0.5;
+    padding-left: 2;
+    padding-right: 2;
+    background-color: rgba(60, 20, 20, 0.5);
+    border-color: #ff4444;
+    border-width: 0.06;
+    border-radius: 0.4;
+    cursor: pointer;
+  }
+  .back-text {
+    font-size: 1.4;
+    color: #ff6666;
+  }
+  .hint {
+    font-size: 0.9;
+    color: #446677;
+  }
+</style>
+<div class="settings-panel">
+  <span class="header">SETTINGS</span>
+  <span class="section-title">AUDIO</span>
+  <div class="setting-row">
+    <span class="label">Master Volume</span>
+    <span id="master-vol" class="value">70%</span>
+  </div>
+  <div class="setting-row">
+    <span class="label">SFX Volume</span>
+    <span id="sfx-vol" class="value">80%</span>
+  </div>
+  <div class="setting-row">
+    <span class="label">Music Volume</span>
+    <span id="music-vol" class="value">30%</span>
+  </div>
+  <span class="section-title">CONTROLS</span>
+  <span class="hint">VR: Right trigger to charge/shoot, right thumbstick to aim, B to pause</span>
+  <span class="hint">Browser: Click + hold to charge, release to shoot, right-drag to orbit camera</span>
+  <span class="hint">Ball in hand: Left thumbstick / mouse to move, A / R to place</span>
+  <button id="back-btn" class="back-btn" cursor="pointer">
+    <span class="back-text">BACK</span>
+  </button>
+</div>
