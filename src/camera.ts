@@ -24,6 +24,11 @@ export class CameraController {
   // Follow mode tracking
   private followBallId: number = CUE_BALL_ID;
 
+  // Camera shake
+  private shakeIntensity: number = 0;
+  private shakeDuration: number = 0;
+  private shakeTime: number = 0;
+
   constructor() {}
 
   setMode(mode: CameraMode): void {
@@ -45,6 +50,13 @@ export class CameraController {
       case 'behind': return 'BEHIND BALL';
       case 'follow': return 'FOLLOW SHOT';
     }
+  }
+
+  // Trigger camera shake (for powerful shots, breaks)
+  shake(intensity: number, duration: number): void {
+    this.shakeIntensity = intensity;
+    this.shakeDuration = duration;
+    this.shakeTime = 0;
   }
 
   // Handle mouse drag for orbit mode
@@ -164,6 +176,22 @@ export class CameraController {
 
     // Apply to camera
     cam.position.copy(this.currentPos);
+
+    // Apply camera shake
+    if (this.shakeDuration > 0) {
+      this.shakeTime += dt;
+      if (this.shakeTime < this.shakeDuration) {
+        const decay = 1 - (this.shakeTime / this.shakeDuration);
+        const magnitude = this.shakeIntensity * decay;
+        cam.position.x += (Math.random() - 0.5) * magnitude;
+        cam.position.y += (Math.random() - 0.5) * magnitude * 0.5;
+        cam.position.z += (Math.random() - 0.5) * magnitude;
+      } else {
+        this.shakeDuration = 0;
+        this.shakeIntensity = 0;
+      }
+    }
+
     cam.lookAt(this.currentTarget.x, this.currentTarget.y, this.currentTarget.z);
   }
 }

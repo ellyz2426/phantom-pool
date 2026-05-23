@@ -106,6 +106,8 @@ async function main() {
   const spinSystem = new SpinSystem(world);
   gameManager.setSpinSystem(spinSystem);
   cueStick.setSpinSystem(spinSystem);
+  cueStick.setEffects(effects);
+  cueStick.setCameraController(cameraCtrl);
 
   // Setup UI (all PanelUI, zero HTML DOM)
   const ui = setupUI(world, gameManager, audioManager, cameraCtrl, spinSystem);

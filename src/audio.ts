@@ -305,6 +305,90 @@ export class AudioManager {
     shimmer.stop(now + 0.75);
   }
 
+  // Chalk dust sound (soft puff)
+  playChalkDust(): void {
+    const ctx = this.ensureContext();
+    const now = ctx.currentTime;
+
+    // Soft white noise puff
+    const bufferSize = ctx.sampleRate * 0.08;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize) * 0.5;
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.1, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 4000;
+    filter.Q.value = 0.5;
+    noise.connect(filter);
+    filter.connect(noiseGain);
+    noiseGain.connect(this.sfxGain!);
+    noise.start(now);
+  }
+
+  // Turn change notification sound
+  playTurnChange(): void {
+    const ctx = this.ensureContext();
+    const now = ctx.currentTime;
+
+    // Subtle two-tone pip
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(660, now);
+    osc.frequency.setValueAtTime(880, now + 0.08);
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.12, now + 0.02);
+    gain.gain.setValueAtTime(0.12, now + 0.06);
+    gain.gain.linearRampToValueAtTime(0.15, now + 0.1);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+    osc.connect(gain);
+    gain.connect(this.sfxGain!);
+    osc.start(now);
+    osc.stop(now + 0.25);
+  }
+
+  // Powerful break sound enhancement
+  playPowerBreak(): void {
+    const ctx = this.ensureContext();
+    const now = ctx.currentTime;
+
+    // Low rumble
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(80, now);
+    osc.frequency.exponentialRampToValueAtTime(40, now + 0.5);
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+    osc.connect(gain);
+    gain.connect(this.sfxGain!);
+    osc.start(now);
+    osc.stop(now + 0.7);
+
+    // Crack noise burst
+    const bufferSize = ctx.sampleRate * 0.03;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2);
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.5, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+    noise.connect(noiseGain);
+    noiseGain.connect(this.sfxGain!);
+    noise.start(now);
+  }
+
   setMasterVolume(v: number): void {
     this.masterVolume = v;
     if (this.masterGain) this.masterGain.gain.value = v;

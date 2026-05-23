@@ -37,6 +37,7 @@ interface UIEntities {
   spinEntity: any;
   achievementToastEntity: any;
   achievementsEntity: any;
+  helpEntity: any;
 }
 
 export interface UISystem {
@@ -162,6 +163,16 @@ export function setupUI(world: World, game: GameManager, audio: AudioManager, ca
   });
   entities.achievementsEntity = achievementsEntity;
 
+  // ---- HELP PANEL (world-space) ----
+  const helpEntity = world.createTransformEntity(undefined, { persistent: true });
+  helpEntity.object3D.position.set(0, 1.6, -1.8);
+  helpEntity.addComponent(PanelUI, {
+    config: '/ui/help.json',
+    maxWidth: 1.2,
+    maxHeight: 1.4,
+  });
+  entities.helpEntity = helpEntity;
+
   // ---- MESSAGE TOAST (head-following, top center) ----
   const messageEntity = world.createTransformEntity(undefined, { persistent: true });
   messageEntity.addComponent(PanelUI, {
@@ -231,6 +242,7 @@ export function setupUI(world: World, game: GameManager, audio: AudioManager, ca
     setVisible(entities.settingsEntity, state === 'settings');
     setVisible(entities.leaderboardEntity, state === 'leaderboard');
     setVisible(entities.achievementsEntity, state === 'achievements' as GameState);
+    setVisible(entities.helpEntity, state === 'help' as GameState);
     setVisible(entities.messageEntity, game.message !== '');
     setVisible(entities.cameraEntity, isPlaying);
 
@@ -338,6 +350,7 @@ function wireEvents(entities: UIEntities, game: GameManager, audio: AudioManager
     titleDoc.getElementById('settings-btn')?.addEventListener('click', () => { game.state = 'settings'; });
     titleDoc.getElementById('leaderboard-btn')?.addEventListener('click', () => { game.state = 'leaderboard'; });
     titleDoc.getElementById('achievements-btn')?.addEventListener('click', () => { game.state = 'achievements' as any; });
+    titleDoc.getElementById('help-btn')?.addEventListener('click', () => { game.state = 'help' as any; });
   }
 
   // Mode select buttons
@@ -422,6 +435,12 @@ function wireEvents(entities: UIEntities, game: GameManager, audio: AudioManager
   const achDoc = getDoc(entities.achievementsEntity);
   if (achDoc) {
     achDoc.getElementById('back-btn')?.addEventListener('click', () => game.showTitle());
+  }
+
+  // Help panel buttons
+  const helpDoc = getDoc(entities.helpEntity);
+  if (helpDoc) {
+    helpDoc.getElementById('back-btn')?.addEventListener('click', () => game.showTitle());
   }
 }
 

@@ -89,22 +89,40 @@ export function createTable(world: World): Group {
     table.add(ring);
   }
 
-  // Playing surface (dark green with subtle glow)
-  const surfaceGeo = new PlaneGeometry(TABLE_WIDTH, TABLE_LENGTH);
+  // Playing surface (rich green baize with subtle depth)
+  const surfaceGeo = new PlaneGeometry(TABLE_WIDTH, TABLE_LENGTH, 32, 64);
   const surfaceMat = new MeshStandardMaterial({
-    color: 0x003322,
-    metalness: 0.1,
-    roughness: 0.8,
-    emissive: new Color(0x001a11),
-    emissiveIntensity: 0.5,
+    color: 0x004d33,
+    metalness: 0.05,
+    roughness: 0.92,
+    emissive: new Color(0x002a1a),
+    emissiveIntensity: 0.4,
   });
   const surface = new Mesh(surfaceGeo, surfaceMat);
   surface.rotation.x = -Math.PI / 2;
   surface.position.y = TABLE_HEIGHT;
   table.add(surface);
 
+  // Subtle directional nap lines on felt (thin lines along length)
+  const napGroup = new Group();
+  napGroup.name = 'felt-nap';
+  const napMat = new MeshBasicMaterial({
+    color: 0x005533,
+    transparent: true,
+    opacity: 0.08,
+  });
+  const napCount = 20;
+  for (let i = 0; i < napCount; i++) {
+    const x = -TABLE_WIDTH / 2 + (i / (napCount - 1)) * TABLE_WIDTH;
+    const lineGeo = new BoxGeometry(0.001, 0.0005, TABLE_LENGTH - 0.02);
+    const line = new Mesh(lineGeo, napMat);
+    line.position.set(x, TABLE_HEIGHT + 0.0005, 0);
+    napGroup.add(line);
+  }
+  table.add(napGroup);
+
   // Wireframe overlay on surface
-  const surfaceEdges = new EdgesGeometry(surfaceGeo);
+  const surfaceEdges = new EdgesGeometry(new PlaneGeometry(TABLE_WIDTH, TABLE_LENGTH));
   const surfaceWire = new LineSegments(surfaceEdges, new LineBasicMaterial({
     color: 0x00ffcc,
     transparent: true,
@@ -113,6 +131,26 @@ export function createTable(world: World): Group {
   surfaceWire.rotation.x = -Math.PI / 2;
   surfaceWire.position.y = TABLE_HEIGHT + 0.001;
   table.add(surfaceWire);
+
+  // Subtle center-line decoration (faint cross on playing surface)
+  const centerLineMat = new MeshBasicMaterial({
+    color: 0x00aa77,
+    transparent: true,
+    opacity: 0.06,
+  });
+  const centerLineH = new Mesh(
+    new BoxGeometry(TABLE_WIDTH - 0.04, 0.001, 0.002),
+    centerLineMat
+  );
+  centerLineH.position.set(0, TABLE_HEIGHT + 0.0008, 0);
+  table.add(centerLineH);
+
+  const centerLineV = new Mesh(
+    new BoxGeometry(0.002, 0.001, TABLE_LENGTH - 0.04),
+    centerLineMat
+  );
+  centerLineV.position.set(0, TABLE_HEIGHT + 0.0008, 0);
+  table.add(centerLineV);
 
   // Rails (4 sides, split by pockets)
   createRails(table);

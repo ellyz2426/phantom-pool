@@ -20,6 +20,8 @@ import { BallManager, CUE_BALL_ID, PoolBall } from './balls';
 import { TABLE_HEIGHT, BALL_RADIUS, TABLE_WIDTH, TABLE_LENGTH } from './table';
 import { GameManager } from './game';
 import { AudioManager } from './audio';
+import { EffectsManager } from './effects';
+import { CameraController } from './camera';
 import type { SpinSystem } from './spin';
 
 const CUE_LENGTH = 1.4;
@@ -41,6 +43,8 @@ export class CueStick {
   world: World;
   ballManager: BallManager;
   spinSystem: SpinSystem | null = null;
+  effects: EffectsManager | null = null;
+  cameraCtrl: CameraController | null = null;
 
   aimAngle: number = 0;        // Radians around Y axis
   power: number = 0;
@@ -177,6 +181,14 @@ export class CueStick {
     this.spinSystem = spin;
   }
 
+  setEffects(effects: EffectsManager): void {
+    this.effects = effects;
+  }
+
+  setCameraController(cam: CameraController): void {
+    this.cameraCtrl = cam;
+  }
+
   release(game: GameManager, audio: AudioManager): void {
     if (!this.isCharging || this.power < 0.1) {
       this.isCharging = false;
@@ -206,6 +218,27 @@ export class CueStick {
     }
 
     audio.playCueHit(shotPower / MAX_POWER);
+
+    // Chalk dust effect at cue ball position
+    if (this.effects) {
+      this.effects.spawnChalkDust(
+        cueBall.position.clone(),
+        this.aimDir.clone(),
+        shotPower
+      );
+      audio.playChalkDust();
+    }
+
+    // Camera shake on powerful shots
+    if (this.cameraCtrl && shotPower > 4.0) {
+      const shakeStrength = (shotPower - 4.0) / (MAX_POWER - 4.0);
+      this.cameraCtrl.shake(0.01 + shakeStrength * 0.02, 0.2 + shakeStrength * 0.3);
+    }
+
+    // Extra audio for break-power shots
+    if (shotPower > 6.0) {
+      audio.playPowerBreak();
+    }
 
     this.isCharging = false;
     this.power = 0;

@@ -65,5 +65,8 @@
   <button id="achievements-btn" class="menu-button" cursor="pointer">
     <span class="btn-text">ACHIEVEMENTS</span>
   </button>
+  <button id="help-btn" class="menu-button" cursor="pointer">
+    <span class="btn-text">HELP</span>
+  </button>
   <span class="controls-hint">VR: Trigger to select | Browser: Click</span>
 </div>

@@ -1,0 +1,105 @@
+<style>
+  .help-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 2;
+    padding-bottom: 2;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(0, 5, 15, 0.94);
+    border-color: #00ddff;
+    border-width: 0.15;
+    border-radius: 1.5;
+    gap: 1;
+  }
+  .help-title {
+    font-size: 3;
+    color: #00ffdd;
+    font-weight: bold;
+  }
+  .section-title {
+    font-size: 1.8;
+    color: #00ccaa;
+    font-weight: bold;
+  }
+  .control-row {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5;
+    align-items: center;
+  }
+  .key-label {
+    font-size: 1.2;
+    color: #00ddff;
+    font-weight: bold;
+    min-width: 10;
+  }
+  .key-desc {
+    font-size: 1.1;
+    color: #88bbaa;
+    flex: 1;
+  }
+  .divider {
+    background-color: rgba(0, 200, 255, 0.2);
+    height: 0.06;
+    min-width: 22;
+  }
+  .spin-top { color: #00ff66; font-size: 1.1; }
+  .spin-back { color: #ff3300; font-size: 1.1; }
+  .spin-eng { color: #ff8800; font-size: 1.1; }
+  .back-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.6;
+    padding-bottom: 0.6;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(0, 50, 80, 0.6);
+    border-color: #00bbdd;
+    border-width: 0.08;
+    border-radius: 0.5;
+    cursor: pointer;
+    min-width: 12;
+  }
+  .back-button:hover {
+    background-color: rgba(0, 80, 120, 0.8);
+  }
+  .btn-text {
+    font-size: 1.8;
+    color: #00ddff;
+    font-weight: bold;
+  }
+</style>
+<div class="help-panel">
+  <span class="help-title">CONTROLS</span>
+  <div class="divider"></div>
+  <span class="section-title">🖱️ BROWSER</span>
+  <div class="control-row"><span class="key-label">Click / Space</span><span class="key-desc">Charge shot</span></div>
+  <div class="control-row"><span class="key-label">Release</span><span class="key-desc">Shoot</span></div>
+  <div class="control-row"><span class="key-label">Mouse</span><span class="key-desc">Aim cue stick</span></div>
+  <div class="control-row"><span class="key-label">Right Drag</span><span class="key-desc">Orbit camera</span></div>
+  <div class="control-row"><span class="key-label">Scroll</span><span class="key-desc">Zoom in/out</span></div>
+  <div class="control-row"><span class="key-label">Arrow Keys</span><span class="key-desc">Adjust spin/english</span></div>
+  <div class="control-row"><span class="key-label">X</span><span class="key-desc">Reset spin</span></div>
+  <div class="control-row"><span class="key-label">C / 1-4</span><span class="key-desc">Change camera</span></div>
+  <div class="control-row"><span class="key-label">ESC</span><span class="key-desc">Pause game</span></div>
+  <div class="divider"></div>
+  <span class="section-title">🎮 VR CONTROLLERS</span>
+  <div class="control-row"><span class="key-label">R Trigger</span><span class="key-desc">Charge &amp; shoot</span></div>
+  <div class="control-row"><span class="key-label">R Thumbstick</span><span class="key-desc">Aim cue stick</span></div>
+  <div class="control-row"><span class="key-label">L Thumbstick</span><span class="key-desc">Adjust spin</span></div>
+  <div class="control-row"><span class="key-label">Squeeze</span><span class="key-desc">Reset spin</span></div>
+  <div class="control-row"><span class="key-label">A Button</span><span class="key-desc">Confirm/Place</span></div>
+  <div class="control-row"><span class="key-label">B Button</span><span class="key-desc">Pause</span></div>
+  <div class="divider"></div>
+  <span class="section-title">🌀 SPIN TYPES</span>
+  <span class="spin-top">↑ Topspin — Ball rolls forward after hit</span>
+  <span class="spin-back">↓ Backspin — Ball reverses after hit</span>
+  <span class="spin-eng">← → English — Ball curves sideways</span>
+  <div class="divider"></div>
+  <button id="back-btn" class="back-button" cursor="pointer">
+    <span class="btn-text">BACK</span>
+  </button>
+</div>

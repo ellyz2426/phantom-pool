@@ -11,7 +11,7 @@ import type { SpinSystem } from './spin';
 import type { EffectsManager } from './effects';
 
 export type GameMode = '8ball' | '9ball' | 'freeplay' | 'trickshot';
-export type GameState = 'title' | 'mode_select' | 'difficulty_select' | 'playing' | 'aiming' | 'shooting' | 'watching' | 'ball_in_hand' | 'game_over' | 'paused' | 'settings' | 'leaderboard' | 'achievements';
+export type GameState = 'title' | 'mode_select' | 'difficulty_select' | 'playing' | 'aiming' | 'shooting' | 'watching' | 'ball_in_hand' | 'game_over' | 'paused' | 'settings' | 'leaderboard' | 'achievements' | 'help';
 export type PlayerAssignment = 'solids' | 'stripes' | 'none';
 
 export interface Player {
@@ -86,7 +86,7 @@ export class GameManager {
   currentGameFouls: number = 0;
 
   onUIUpdate: (() => void) | null = null;
-  onAchievementUnlock: ((ach: { id: string; name: string; description: string; icon: string }) => void) | null = null;
+  onAchievementUnlock: ((ach: { id: string; name: string; description: string; icon: string; unlocked: boolean }) => void) | null = null;
 
   constructor(ballManager: BallManager, physics: PhysicsEngine, cueStick: CueStick, audio: AudioManager, effects: EffectsManager) {
     this.ballManager = ballManager;
@@ -417,6 +417,7 @@ export class GameManager {
     if (this.mode === 'freeplay') return;
     this.currentPlayerIndex = 1 - this.currentPlayerIndex;
     this.currentStreak = 0;
+    this.audio.playTurnChange();
   }
 
   togglePause(): void {

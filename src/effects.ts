@@ -130,6 +130,56 @@ export class EffectsManager {
     this.trails.push({ mesh, life: 0.2 });
   }
 
+  // Chalk dust puff when cue strikes ball
+  spawnChalkDust(position: Vector3, direction: Vector3, power: number): void {
+    const count = Math.min(Math.floor(power * 3) + 4, 20);
+    const intensity = Math.min(power / 6.0, 1.0);
+
+    for (let i = 0; i < count; i++) {
+      const geo = new SphereGeometry(0.002 + Math.random() * 0.004, 4, 4);
+      // Blue-white chalk dust
+      const hue = Math.random() > 0.3 ? 0x88ccff : 0xaaddff;
+      const mat = new MeshBasicMaterial({
+        color: hue,
+        transparent: true,
+        opacity: 0.5 * intensity,
+        blending: AdditiveBlending,
+      });
+      const mesh = new Mesh(geo, mat);
+      mesh.position.copy(position);
+      this.effectsGroup.add(mesh);
+
+      // Spread in a cone around the shot direction
+      const spread = 0.6;
+      const speed = (0.1 + Math.random() * 0.3) * (0.5 + power * 0.1);
+      const vx = direction.x * speed + (Math.random() - 0.5) * spread * speed;
+      const vz = direction.z * speed + (Math.random() - 0.5) * spread * speed;
+      const vy = 0.2 + Math.random() * 0.4;
+
+      this.particles.push({
+        mesh,
+        velocity: new Vector3(vx, vy, vz),
+        life: 0.4 + Math.random() * 0.4,
+        maxLife: 0.4 + Math.random() * 0.4,
+      });
+    }
+  }
+
+  // Turn change flash effect at table center
+  spawnTurnFlash(position: Vector3): void {
+    const geo = new SphereGeometry(0.03, 8, 8);
+    const mat = new MeshBasicMaterial({
+      color: 0x00ffdd,
+      transparent: true,
+      opacity: 0.6,
+      blending: AdditiveBlending,
+    });
+    const mesh = new Mesh(geo, mat);
+    mesh.position.copy(position);
+    this.effectsGroup.add(mesh);
+    this.pocketFlashes.push({ mesh, life: 0.3 });
+  }
+
   // Cue ball ghost trail for high-speed shots
   spawnCueTrail(position: Vector3): void {
     this.spawnTrailPoint(position, 0x88ccff);
