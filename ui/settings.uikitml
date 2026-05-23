@@ -10,7 +10,7 @@
     border-color: #00ddff;
     border-width: 0.12;
     border-radius: 1.5;
-    gap: 1;
+    gap: 0.8;
   }
   .header {
     font-size: 2.5;
@@ -25,17 +25,41 @@
   .setting-row {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
-    gap: 2;
+    align-items: center;
+    gap: 1;
   }
   .label {
     font-size: 1.2;
     color: #88aacc;
+    min-width: 10;
+  }
+  .vol-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.3;
+    padding-bottom: 0.3;
+    padding-left: 0.8;
+    padding-right: 0.8;
+    background-color: rgba(0, 50, 80, 0.6);
+    border-color: #00bbdd;
+    border-width: 0.04;
+    border-radius: 0.3;
+    cursor: pointer;
+  }
+  .vol-btn:hover {
+    background-color: rgba(0, 80, 120, 0.8);
+  }
+  .vol-btn-text {
+    font-size: 1.4;
+    color: #00ddff;
+    font-weight: bold;
   }
   .value {
     font-size: 1.2;
     color: #00ddff;
     font-weight: bold;
+    min-width: 4;
   }
   .back-btn {
     display: flex;
@@ -59,26 +83,37 @@
     font-size: 0.9;
     color: #446677;
   }
+  .divider {
+    background-color: rgba(0, 100, 150, 0.3);
+    height: 0.03;
+  }
 </style>
 <div class="settings-panel">
   <span class="header">SETTINGS</span>
   <span class="section-title">AUDIO</span>
   <div class="setting-row">
-    <span class="label">Master Volume</span>
+    <span class="label">Master</span>
+    <button id="master-down" class="vol-btn" cursor="pointer"><span class="vol-btn-text">−</span></button>
     <span id="master-vol" class="value">70%</span>
+    <button id="master-up" class="vol-btn" cursor="pointer"><span class="vol-btn-text">+</span></button>
   </div>
   <div class="setting-row">
-    <span class="label">SFX Volume</span>
+    <span class="label">SFX</span>
+    <button id="sfx-down" class="vol-btn" cursor="pointer"><span class="vol-btn-text">−</span></button>
     <span id="sfx-vol" class="value">80%</span>
+    <button id="sfx-up" class="vol-btn" cursor="pointer"><span class="vol-btn-text">+</span></button>
   </div>
   <div class="setting-row">
-    <span class="label">Music Volume</span>
+    <span class="label">Music</span>
+    <button id="music-down" class="vol-btn" cursor="pointer"><span class="vol-btn-text">−</span></button>
     <span id="music-vol" class="value">30%</span>
+    <button id="music-up" class="vol-btn" cursor="pointer"><span class="vol-btn-text">+</span></button>
   </div>
+  <div class="divider"></div>
   <span class="section-title">CONTROLS</span>
-  <span class="hint">VR: Right trigger to charge/shoot, right thumbstick to aim, B to pause</span>
-  <span class="hint">Browser: Click + hold to charge, release to shoot, right-drag to orbit camera</span>
-  <span class="hint">Ball in hand: Left thumbstick / mouse to move, A / R to place</span>
+  <span class="hint">VR: Right trigger charge/shoot, thumbstick aim, B pause</span>
+  <span class="hint">Browser: Click+hold charge, release shoot, right-drag orbit</span>
+  <span class="hint">Ball in hand: Left thumbstick / mouse, A / R to place</span>
   <button id="back-btn" class="back-btn" cursor="pointer">
     <span class="back-text">BACK</span>
   </button>

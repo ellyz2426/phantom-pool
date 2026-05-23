@@ -36,7 +36,7 @@ import {
   ConeGeometry,
 } from '@iwsdk/core';
 
-import { createEnvironment } from './environment';
+import { createEnvironment, updateEnvironment } from './environment';
 import { createTable, TABLE_WIDTH, TABLE_LENGTH, TABLE_HEIGHT, RAIL_HEIGHT, POCKET_RADIUS } from './table';
 import { BallManager, CUE_BALL_ID } from './balls';
 import { CueStick } from './cue';
@@ -45,13 +45,14 @@ import { GameManager, GameMode } from './game';
 import { AudioManager } from './audio';
 import { setupUI } from './ui';
 import { XRInputHandler } from './xrinput';
+import { EffectsManager } from './effects';
 
 async function main() {
   const container = document.getElementById('scene-container') as HTMLDivElement;
 
   const world = await World.create(container, {
     xr: { offer: 'once' },
-    input: { canvasPointerEvents: true },
+    ...({ input: { canvasPointerEvents: true } } as any),
     features: {
       grabbing: true,
       locomotion: false,
@@ -61,10 +62,10 @@ async function main() {
     render: {
       near: 0.01,
       far: 200,
-      camera: {
+      ...({ camera: {
         position: [0, TABLE_HEIGHT + 0.8, TABLE_LENGTH * 0.6 + 0.5],
         lookAt: [0, TABLE_HEIGHT, 0],
-      },
+      }} as any),
     },
   });
 
@@ -86,8 +87,11 @@ async function main() {
   // Create audio manager
   const audioManager = new AudioManager();
 
+  // Create effects manager
+  const effects = new EffectsManager(world);
+
   // Create game manager
-  const gameManager = new GameManager(ballManager, physics, cueStick, audioManager);
+  const gameManager = new GameManager(ballManager, physics, cueStick, audioManager, effects);
 
   // Setup UI (all PanelUI, zero HTML DOM)
   const ui = setupUI(world, gameManager, audioManager);
@@ -179,13 +183,13 @@ async function main() {
 
     if (!gameManager.isPaused) {
       // Update physics
-      physics.update(dt, gameManager, audioManager);
+      physics.update(dt, gameManager, audioManager, effects);
 
       // Update cue stick
       cueStick.update(dt, world);
 
       // Update ball visuals
-      ballManager.update(dt);
+      ballManager.update(dt, gameManager.state === 'ball_in_hand');
 
       // Update game state
       gameManager.update(dt);
@@ -193,12 +197,24 @@ async function main() {
       // Update XR input
       xrInput.update(dt);
 
+      // Update effects (sparks, trails, etc.)
+      effects.update(dt);
+
+      // Update cue ball trail
+      const cueBall = ballManager.getCueBall();
+      if (cueBall && !cueBall.pocketed && cueBall.velocity.length() > 1.5) {
+        effects.spawnCueTrail(cueBall.position);
+      }
+
       // Update UI
       ui.update(gameManager, ballManager, cueStick);
     }
 
+    // Update animated environment (always, even when paused)
+    updateEnvironment(dt);
+
     // Update camera (browser mode)
-    if (!world.input.xr?.gamepads?.right) {
+    if (!(world.input as any).xr?.gamepads?.right) {
       const cam = (world as any).render?.camera || (world as any).scene?.userData?.camera;
       if (cam) {
         const target = ballManager.getCueBall()?.position || new Vector3(0, TABLE_HEIGHT, 0);

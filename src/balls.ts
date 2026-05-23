@@ -12,6 +12,8 @@ import {
   LineSegments,
   LineBasicMaterial,
   CylinderGeometry,
+  RingGeometry,
+  AdditiveBlending,
 } from '@iwsdk/core';
 
 import { BALL_RADIUS, TABLE_HEIGHT, TABLE_WIDTH, TABLE_LENGTH } from './table';
@@ -56,12 +58,28 @@ export class BallManager {
   balls: PoolBall[] = [];
   world: World;
   ballGroup: Group;
+  ballInHandRing: Mesh | null = null;
+  private ballInHandTime: number = 0;
 
   constructor(world: World) {
     this.world = world;
     this.ballGroup = new Group();
     this.ballGroup.name = 'balls';
     world.scene.add(this.ballGroup);
+
+    // Ball-in-hand indicator ring
+    const ringGeo = new RingGeometry(BALL_RADIUS * 1.5, BALL_RADIUS * 2.0, 24);
+    const ringMat = new MeshBasicMaterial({
+      color: 0x00ff88,
+      transparent: true,
+      opacity: 0.6,
+      side: 2,
+      blending: AdditiveBlending,
+    });
+    this.ballInHandRing = new Mesh(ringGeo, ringMat);
+    this.ballInHandRing.rotation.x = -Math.PI / 2;
+    this.ballInHandRing.visible = false;
+    world.scene.add(this.ballInHandRing);
   }
 
   createBalls(): void {
@@ -259,7 +277,25 @@ export class BallManager {
     return this.balls.filter(b => !b.pocketed).every(b => b.velocity.length() < 0.001);
   }
 
-  update(dt: number): void {
+  update(dt: number, isBallInHand: boolean = false): void {
+    this.ballInHandTime += dt;
+
+    // Update ball-in-hand indicator
+    if (this.ballInHandRing) {
+      this.ballInHandRing.visible = isBallInHand;
+      if (isBallInHand) {
+        const cueBall = this.getCueBall();
+        if (cueBall && !cueBall.pocketed) {
+          this.ballInHandRing.position.set(cueBall.position.x, TABLE_HEIGHT + 0.002, cueBall.position.z);
+          // Pulsing scale
+          const pulse = 1.0 + 0.15 * Math.sin(this.ballInHandTime * 4);
+          this.ballInHandRing.scale.setScalar(pulse);
+          // Pulsing opacity
+          (this.ballInHandRing.material as MeshBasicMaterial).opacity = 0.4 + 0.2 * Math.sin(this.ballInHandTime * 3);
+        }
+      }
+    }
+
     for (const ball of this.balls) {
       if (ball.pocketed) {
         // Hide pocketed balls
@@ -312,4 +348,3 @@ export class BallManager {
   }
 }
 
-import { AdditiveBlending } from '@iwsdk/core';

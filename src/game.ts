@@ -5,6 +5,7 @@ import { PhysicsEngine } from './physics';
 import { CueStick } from './cue';
 import { AudioManager } from './audio';
 import { TABLE_HEIGHT, TABLE_LENGTH, TABLE_WIDTH } from './table';
+import type { EffectsManager } from './effects';
 
 export type GameMode = '8ball' | '9ball' | 'freeplay' | 'trickshot';
 export type GameState = 'title' | 'mode_select' | 'playing' | 'aiming' | 'shooting' | 'watching' | 'ball_in_hand' | 'game_over' | 'paused' | 'settings' | 'leaderboard';
@@ -31,6 +32,7 @@ export class GameManager {
   physics: PhysicsEngine;
   cueStick: CueStick;
   audio: AudioManager;
+  effects: EffectsManager;
 
   state: GameState = 'title';
   mode: GameMode = '8ball';
@@ -59,11 +61,12 @@ export class GameManager {
 
   onUIUpdate: (() => void) | null = null;
 
-  constructor(ballManager: BallManager, physics: PhysicsEngine, cueStick: CueStick, audio: AudioManager) {
+  constructor(ballManager: BallManager, physics: PhysicsEngine, cueStick: CueStick, audio: AudioManager, effects: EffectsManager) {
     this.ballManager = ballManager;
     this.physics = physics;
     this.cueStick = cueStick;
     this.audio = audio;
+    this.effects = effects;
 
     this.loadStats();
     this.initTrickShots();

@@ -4,6 +4,7 @@ import { BallManager, PoolBall, CUE_BALL_ID } from './balls';
 import { TABLE_WIDTH, TABLE_LENGTH, TABLE_HEIGHT, BALL_RADIUS, POCKET_POSITIONS, POCKET_RADIUS, RAIL_HEIGHT } from './table';
 import { GameManager } from './game';
 import { AudioManager } from './audio';
+import { EffectsManager } from './effects';
 
 const FRICTION = 0.985;        // Rolling friction per frame
 const BALL_MASS = 0.17;        // kg (standard pool ball)
@@ -31,7 +32,7 @@ export class PhysicsEngine {
     this.cueBallPocketed = false;
   }
 
-  update(dt: number, game: GameManager, audio: AudioManager): void {
+  update(dt: number, game: GameManager, audio: AudioManager, effects?: EffectsManager): void {
     if (game.state !== 'shooting' && game.state !== 'watching') return;
 
     const subDt = dt / SUB_STEPS;
@@ -69,7 +70,7 @@ export class PhysicsEngine {
           const a = balls[i];
           const b = balls[j];
           if (a.pocketed || b.pocketed) continue;
-          this.resolveBallCollision(a, b, audio, game);
+          this.resolveBallCollision(a, b, audio, game, effects);
         }
       }
 
@@ -82,7 +83,7 @@ export class PhysicsEngine {
       // Pocket detection
       for (const ball of balls) {
         if (ball.pocketed) continue;
-        this.checkPocket(ball, audio, game);
+        this.checkPocket(ball, audio, game, effects);
       }
     }
 
@@ -99,7 +100,7 @@ export class PhysicsEngine {
     }
   }
 
-  private resolveBallCollision(a: PoolBall, b: PoolBall, audio: AudioManager, game: GameManager): void {
+  private resolveBallCollision(a: PoolBall, b: PoolBall, audio: AudioManager, game: GameManager, effects?: EffectsManager): void {
     const dx = b.position.x - a.position.x;
     const dz = b.position.z - a.position.z;
     const dist = Math.sqrt(dx * dx + dz * dz);
@@ -143,6 +144,16 @@ export class PhysicsEngine {
       // Sound
       const impactSpeed = Math.abs(dvn);
       audio.playBallHit(impactSpeed);
+
+      // Visual collision sparks
+      if (effects && impactSpeed > 0.5) {
+        const hitPoint = new Vector3(
+          (a.position.x + b.position.x) / 2,
+          (a.position.y + b.position.y) / 2,
+          (a.position.z + b.position.z) / 2
+        );
+        effects.spawnCollisionSparks(hitPoint, impactSpeed);
+      }
     }
   }
 
@@ -199,7 +210,7 @@ export class PhysicsEngine {
     return false;
   }
 
-  private checkPocket(ball: PoolBall, audio: AudioManager, game: GameManager): void {
+  private checkPocket(ball: PoolBall, audio: AudioManager, game: GameManager, effects?: EffectsManager): void {
     for (const pp of POCKET_POSITIONS) {
       const dx = ball.position.x - pp.x;
       const dz = ball.position.z - pp.z;
@@ -217,6 +228,12 @@ export class PhysicsEngine {
         } else {
           audio.playPocket();
         }
+
+        // Pocket flash effect
+        if (effects) {
+          effects.spawnPocketFlash(pp.clone());
+        }
+
         break;
       }
     }

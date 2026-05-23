@@ -14,6 +14,13 @@ import { BallManager } from './balls';
 import { CueStick } from './cue';
 import { AudioManager } from './audio';
 
+// UIKit element type helper - elements use signals for reactive text
+type UIKitElement = { text: { value: string }; addEventListener: (event: string, cb: () => void) => void } | null;
+
+function setText(el: any, value: string): void {
+  if (el?.text) el.text.value = value;
+}
+
 interface UIEntities {
   titleEntity: any;
   modeEntity: any;
@@ -220,6 +227,33 @@ function wireEvents(entities: UIEntities, game: GameManager, audio: AudioManager
   const settingsDoc = getDoc(entities.settingsEntity);
   if (settingsDoc) {
     settingsDoc.getElementById('back-btn')?.addEventListener('click', () => game.showTitle());
+
+    // Volume controls
+    const volStep = 0.1;
+    settingsDoc.getElementById('master-down')?.addEventListener('click', () => {
+      audio.setMasterVolume(Math.max(0, audio.masterVolume - volStep));
+      setText(settingsDoc.getElementById('master-vol'), `${Math.round(audio.masterVolume * 100)}%`);
+    });
+    settingsDoc.getElementById('master-up')?.addEventListener('click', () => {
+      audio.setMasterVolume(Math.min(1, audio.masterVolume + volStep));
+      setText(settingsDoc.getElementById('master-vol'), `${Math.round(audio.masterVolume * 100)}%`);
+    });
+    settingsDoc.getElementById('sfx-down')?.addEventListener('click', () => {
+      audio.setSfxVolume(Math.max(0, audio.sfxVolume - volStep));
+      setText(settingsDoc.getElementById('sfx-vol'), `${Math.round(audio.sfxVolume * 100)}%`);
+    });
+    settingsDoc.getElementById('sfx-up')?.addEventListener('click', () => {
+      audio.setSfxVolume(Math.min(1, audio.sfxVolume + volStep));
+      setText(settingsDoc.getElementById('sfx-vol'), `${Math.round(audio.sfxVolume * 100)}%`);
+    });
+    settingsDoc.getElementById('music-down')?.addEventListener('click', () => {
+      audio.setMusicVolume(Math.max(0, audio.musicVolume - volStep));
+      setText(settingsDoc.getElementById('music-vol'), `${Math.round(audio.musicVolume * 100)}%`);
+    });
+    settingsDoc.getElementById('music-up')?.addEventListener('click', () => {
+      audio.setMusicVolume(Math.min(1, audio.musicVolume + volStep));
+      setText(settingsDoc.getElementById('music-vol'), `${Math.round(audio.musicVolume * 100)}%`);
+    });
   }
 
   // Leaderboard buttons
@@ -234,63 +268,44 @@ function updateHUD(entity: any, game: GameManager, ballManager: BallManager, cue
   if (!doc) return;
 
   const player = game.players[game.currentPlayerIndex];
-  const playerEl = doc.getElementById('player-name');
-  if (playerEl) playerEl.text.value = player?.name || '';
+  setText(doc.getElementById('player-name'), player?.name || '');
+  setText(doc.getElementById('mode-label'), game.mode.toUpperCase());
+  setText(doc.getElementById('shots-count'), `Shots: ${game.shotCount}`);
 
-  const modeEl = doc.getElementById('mode-label');
-  if (modeEl) modeEl.text.value = game.mode.toUpperCase();
-
-  const shotsEl = doc.getElementById('shots-count');
-  if (shotsEl) shotsEl.text.value = `Shots: ${game.shotCount}`;
-
-  const assignEl = doc.getElementById('assignment');
-  if (assignEl) {
-    const assign = player?.assignment || 'none';
-    assignEl.text.value = assign === 'none' ? '' : assign.toUpperCase();
-  }
+  const assign = player?.assignment || 'none';
+  setText(doc.getElementById('assignment'), assign === 'none' ? '' : assign.toUpperCase());
 
   // Power bar
   const powerEl = doc.getElementById('power-bar');
   if (powerEl && cue.isCharging) {
     const ratio = cue.power / 8.0;
-    powerEl.text.value = '|'.repeat(Math.floor(ratio * 20));
+    setText(powerEl, '█'.repeat(Math.floor(ratio * 15)));
   } else if (powerEl) {
-    powerEl.text.value = '';
+    setText(powerEl, '');
   }
 
   // Ball count
-  const solidsEl = doc.getElementById('solids-count');
-  if (solidsEl) solidsEl.text.value = `Solids: ${ballManager.getSolids().length}`;
-
-  const stripesEl = doc.getElementById('stripes-count');
-  if (stripesEl) stripesEl.text.value = `Stripes: ${ballManager.getStripes().length}`;
+  setText(doc.getElementById('solids-count'), `Solids: ${ballManager.getSolids().length}`);
+  setText(doc.getElementById('stripes-count'), `Stripes: ${ballManager.getStripes().length}`);
 }
 
 function updateMessage(entity: any, message: string) {
   const doc = getDoc(entity);
   if (!doc) return;
-  const msgEl = doc.getElementById('message-text');
-  if (msgEl) msgEl.text.value = message;
+  setText(doc.getElementById('message-text'), message);
 }
 
 function updateGameOver(entity: any, game: GameManager) {
   const doc = getDoc(entity);
   if (!doc) return;
 
-  const winnerEl = doc.getElementById('winner-text');
-  if (winnerEl) {
-    if (game.mode === 'trickshot') {
-      winnerEl.text.value = 'TRICKS COMPLETE!';
-    } else {
-      const winner = game.players[0]; // Simplified
-      winnerEl.text.value = game.message || 'GAME OVER';
-    }
+  if (game.mode === 'trickshot') {
+    setText(doc.getElementById('winner-text'), 'TRICKS COMPLETE!');
+  } else {
+    setText(doc.getElementById('winner-text'), game.message || 'GAME OVER');
   }
 
-  const statsEl = doc.getElementById('stats-text');
-  if (statsEl) {
-    statsEl.text.value = `Shots: ${game.shotCount} | Best Streak: ${game.bestStreak}`;
-  }
+  setText(doc.getElementById('stats-text'), `Shots: ${game.shotCount} | Best Streak: ${game.bestStreak}`);
 }
 
 function updateLeaderboard(entity: any, game: GameManager) {
@@ -298,14 +313,11 @@ function updateLeaderboard(entity: any, game: GameManager) {
   if (!doc) return;
 
   for (let i = 0; i < 10; i++) {
-    const el = doc.getElementById(`lb-entry-${i}`);
-    if (el) {
-      const entry = game.leaderboard[i];
-      if (entry) {
-        el.text.value = `${i + 1}. ${entry.name} - ${entry.mode} - ${entry.shots} shots - ${entry.date}`;
-      } else {
-        el.text.value = `${i + 1}. ---`;
-      }
+    const entry = game.leaderboard[i];
+    if (entry) {
+      setText(doc.getElementById(`lb-entry-${i}`), `${i + 1}. ${entry.name} - ${entry.mode} - ${entry.shots} shots - ${entry.date}`);
+    } else {
+      setText(doc.getElementById(`lb-entry-${i}`), `${i + 1}. ---`);
     }
   }
 }
