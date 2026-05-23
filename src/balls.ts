@@ -53,6 +53,9 @@ export interface PoolBall {
   pocketed: boolean;
   isMoving: boolean;
   spin: { x: number; y: number };  // English state from cue shot
+  // Pocket animation state
+  pocketAnimProgress: number;      // 0 = not animating, 0→1 = animating into pocket
+  pocketAnimTarget: Vector3 | null; // Pocket position ball is falling into
 }
 
 export class BallManager {
@@ -175,6 +178,8 @@ export class BallManager {
       position, velocity, angularVelocity,
       pocketed: false, isMoving: false,
       spin: { x: 0, y: 0 },
+      pocketAnimProgress: 0,
+      pocketAnimTarget: null,
     };
   }
 
@@ -279,6 +284,12 @@ export class BallManager {
     return this.balls.filter(b => !b.pocketed).every(b => b.velocity.length() < 0.001);
   }
 
+  // Start pocket animation for a ball
+  startPocketAnimation(ball: PoolBall, pocketPos: Vector3): void {
+    ball.pocketAnimProgress = 0.001; // Start just above zero
+    ball.pocketAnimTarget = pocketPos.clone();
+  }
+
   update(dt: number, isBallInHand: boolean = false): void {
     this.ballInHandTime += dt;
 
@@ -299,12 +310,51 @@ export class BallManager {
     }
 
     for (const ball of this.balls) {
+      // Handle pocket animation (smooth drop + shrink)
+      if (ball.pocketAnimProgress > 0 && ball.pocketAnimProgress < 1) {
+        ball.pocketAnimProgress = Math.min(1, ball.pocketAnimProgress + dt * 3.5);
+        const t = ball.pocketAnimProgress;
+        const eased = t * t; // Ease-in (accelerating drop)
+
+        if (ball.pocketAnimTarget) {
+          // Lerp position toward pocket center
+          const lerpFactor = Math.min(t * 2, 1);
+          ball.position.x += (ball.pocketAnimTarget.x - ball.position.x) * lerpFactor * dt * 8;
+          ball.position.z += (ball.pocketAnimTarget.z - ball.position.z) * lerpFactor * dt * 8;
+        }
+
+        // Drop below table surface
+        ball.position.y = TABLE_HEIGHT + BALL_RADIUS - eased * (BALL_RADIUS * 3);
+
+        // Shrink
+        const scale = Math.max(0, 1 - eased * 0.8);
+        const group = ball.mesh.parent!;
+        group.visible = true;
+        group.position.copy(ball.position);
+        group.scale.setScalar(scale);
+        ball.wireframe.position.copy(ball.position);
+        ball.wireframe.scale.setScalar(scale);
+        ball.glow.position.copy(ball.position);
+        ball.glow.scale.setScalar(scale * 1.15);
+        ball.shadow.visible = false;
+
+        // Animation complete
+        if (ball.pocketAnimProgress >= 1) {
+          group.visible = false;
+          group.scale.setScalar(1); // Reset scale for future use
+          ball.wireframe.scale.setScalar(1);
+          ball.glow.scale.setScalar(1);
+        }
+        continue;
+      }
+
       if (ball.pocketed) {
-        // Hide pocketed balls
+        // Hide fully pocketed balls
         ball.mesh.parent!.visible = false;
         continue;
       }
       ball.mesh.parent!.visible = true;
+      ball.mesh.parent!.scale.setScalar(1); // Ensure scale is normal
 
       // Sync mesh position
       const group = ball.mesh.parent!;

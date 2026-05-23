@@ -86,6 +86,8 @@
   <div class="control-row"><span class="key-label">C / 1-4</span><span class="key-desc">Change camera</span></div>
   <div class="control-row"><span class="key-label">V</span><span class="key-desc">Replay last shot</span></div>
   <div class="control-row"><span class="key-label">T</span><span class="key-desc">Cycle table theme</span></div>
+  <div class="control-row"><span class="key-label">N</span><span class="key-desc">Skip trick (trick mode)</span></div>
+  <div class="control-row"><span class="key-label">R</span><span class="key-desc">Retry trick / Place ball</span></div>
   <div class="control-row"><span class="key-label">ESC</span><span class="key-desc">Pause game</span></div>
   <div class="divider"></div>
   <span class="section-title">🎮 VR CONTROLLERS</span>

@@ -473,6 +473,36 @@ function wireEvents(entities: UIEntities, game: GameManager, audio: AudioManager
     diffDoc.getElementById('diff-hard')?.addEventListener('click', () => game.startGameWithAI(game.selectedModeForDifficulty, 'hard'));
     diffDoc.getElementById('local-2p')?.addEventListener('click', () => game.startGameLocal(game.selectedModeForDifficulty));
     diffDoc.getElementById('back-btn')?.addEventListener('click', () => game.showModeSelect());
+
+    // Match play toggle
+    const updateMatchUI = () => {
+      setText(diffDoc.getElementById('match-toggle-text'), game.matchEnabled ? 'MATCH: ON' : 'MATCH: OFF');
+      const bo3 = diffDoc.getElementById('bo-3-text');
+      const bo5 = diffDoc.getElementById('bo-5-text');
+      const bo7 = diffDoc.getElementById('bo-7-text');
+      if (bo3) setText(bo3, game.matchBestOf === 3 ? '▸Bo3' : 'Bo3');
+      if (bo5) setText(bo5, game.matchBestOf === 5 ? '▸Bo5' : 'Bo5');
+      if (bo7) setText(bo7, game.matchBestOf === 7 ? '▸Bo7' : 'Bo7');
+    };
+    diffDoc.getElementById('match-toggle')?.addEventListener('click', () => {
+      game.toggleMatchMode();
+      updateMatchUI();
+    });
+    diffDoc.getElementById('bo-3')?.addEventListener('click', () => {
+      game.setBestOf(3);
+      game.matchEnabled = true;
+      updateMatchUI();
+    });
+    diffDoc.getElementById('bo-5')?.addEventListener('click', () => {
+      game.setBestOf(5);
+      game.matchEnabled = true;
+      updateMatchUI();
+    });
+    diffDoc.getElementById('bo-7')?.addEventListener('click', () => {
+      game.setBestOf(7);
+      game.matchEnabled = true;
+      updateMatchUI();
+    });
   }
 
   // Pause buttons
@@ -634,6 +664,19 @@ function updateHUD(entity: any, game: GameManager, ballManager: BallManager, cue
 
   setText(doc.getElementById('solids-count'), `Solids: ${ballManager.getSolids().length}`);
   setText(doc.getElementById('stripes-count'), `Stripes: ${ballManager.getStripes().length}`);
+
+  // Trick shot progress
+  const trickEl = doc.getElementById('trick-progress');
+  if (trickEl) {
+    if (game.mode === 'trickshot') {
+      const progress = game.getTrickProgress();
+      const name = game.getTrickName();
+      const shotsLeft = game.getTrickShotsLeft();
+      setText(trickEl, `${progress} — ${name} (${shotsLeft} shot${shotsLeft !== 1 ? 's' : ''} left)`);
+    } else {
+      setText(trickEl, '');
+    }
+  }
 }
 
 function updateMessage(entity: any, message: string) {

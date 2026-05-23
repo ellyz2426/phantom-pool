@@ -68,6 +68,7 @@ export class GameManager {
   // Match play
   match: MatchState | null = null;
   matchEnabled: boolean = false;
+  matchBestOf: number = 3; // Default best-of-3
 
   // Trick shot state
   trickShots: TrickShot[] = [];
@@ -176,7 +177,7 @@ export class GameManager {
 
     // Initialize match if enabled
     if (this.matchEnabled && !this.match) {
-      this.match = { bestOf: 3, p1Wins: 0, p2Wins: 0, currentGame: 1 };
+      this.match = { bestOf: this.matchBestOf, p1Wins: 0, p2Wins: 0, currentGame: 1 };
     }
 
     // Create and rack balls
@@ -536,6 +537,16 @@ export class GameManager {
     this.startGame(this.mode);
   }
 
+  // Set best-of for match play
+  setBestOf(n: number): void {
+    this.matchBestOf = n;
+  }
+
+  // Toggle match mode on/off
+  toggleMatchMode(): void {
+    this.matchEnabled = !this.matchEnabled;
+  }
+
   hasMatchPending(): boolean {
     return this.match !== null;
   }
@@ -543,6 +554,45 @@ export class GameManager {
   getMatchStatus(): string {
     if (!this.match) return '';
     return `Game ${this.match.currentGame} of ${this.match.bestOf} | ${this.match.p1Wins}-${this.match.p2Wins}`;
+  }
+
+  // Skip current trick shot (advance to next one)
+  skipTrickShot(): void {
+    if (this.mode !== 'trickshot') return;
+    this.currentTrickIndex++;
+    if (this.currentTrickIndex >= this.trickShots.length) {
+      this.showMessage('ALL TRICKS COMPLETE!', 3.0);
+      this.audio.playWin();
+      this.state = 'game_over';
+    } else {
+      this.setupCurrentTrick();
+      this.state = 'aiming';
+      this.cueStick.show();
+    }
+  }
+
+  // Retry current trick shot from scratch
+  retryTrickShot(): void {
+    if (this.mode !== 'trickshot') return;
+    if (this.currentTrickIndex < this.trickShots.length) {
+      this.setupCurrentTrick();
+      this.state = 'aiming';
+      this.cueStick.show();
+    }
+  }
+
+  getTrickProgress(): string {
+    if (this.mode !== 'trickshot') return '';
+    return `Trick ${this.currentTrickIndex + 1} / ${this.trickShots.length}`;
+  }
+
+  getTrickName(): string {
+    if (this.mode !== 'trickshot' || this.currentTrickIndex >= this.trickShots.length) return '';
+    return this.trickShots[this.currentTrickIndex].name;
+  }
+
+  getTrickShotsLeft(): number {
+    return this.trickShotsRemaining;
   }
 
   private initTrickShots(): void {

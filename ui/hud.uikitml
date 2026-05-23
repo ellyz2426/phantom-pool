@@ -49,6 +49,10 @@
     font-size: 0.9;
     color: #88aacc;
   }
+  .trick-progress {
+    font-size: 0.9;
+    color: #ff44cc;
+  }
 </style>
 <div class="hud-panel">
   <div class="hud-row">
@@ -65,4 +69,5 @@
     <span id="solids-count" class="ball-count">Solids: 7</span>
     <span id="stripes-count" class="ball-count">Stripes: 7</span>
   </div>
+  <span id="trick-progress" class="trick-progress"></span>
 </div>

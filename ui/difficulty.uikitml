@@ -97,6 +97,67 @@
     font-size: 0.8;
     color: #886600;
   }
+  .match-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.8;
+    padding-top: 0.3;
+    padding-bottom: 0.3;
+  }
+  .match-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.3;
+    padding-bottom: 0.3;
+    padding-left: 1.2;
+    padding-right: 1.2;
+    background-color: rgba(0, 30, 45, 0.5);
+    border-color: #00aacc;
+    border-width: 0.04;
+    border-radius: 0.3;
+    cursor: pointer;
+  }
+  .match-toggle:hover {
+    background-color: rgba(0, 50, 70, 0.7);
+    border-color: #00ffdd;
+  }
+  .match-text {
+    font-size: 1.1;
+    color: #00ddff;
+  }
+  .match-label {
+    font-size: 0.9;
+    color: #5588aa;
+  }
+  .bo-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.2;
+    padding-bottom: 0.2;
+    padding-left: 0.8;
+    padding-right: 0.8;
+    background-color: rgba(0, 25, 40, 0.5);
+    border-color: #336688;
+    border-width: 0.04;
+    border-radius: 0.3;
+    cursor: pointer;
+  }
+  .bo-btn:hover {
+    background-color: rgba(0, 40, 60, 0.7);
+    border-color: #00ffdd;
+  }
+  .bo-text {
+    font-size: 1;
+    color: #88bbdd;
+  }
+  .bo-active {
+    font-size: 1;
+    color: #00ffdd;
+    font-weight: bold;
+  }
   .back-btn {
     display: flex;
     align-items: center;
@@ -131,6 +192,20 @@
     <span class="hard-name">HARD</span>
     <span class="diff-desc">Precise aim, expert strategy</span>
   </button>
+  <div class="match-row">
+    <button id="match-toggle" class="match-toggle" cursor="pointer">
+      <span id="match-toggle-text" class="match-text">MATCH: OFF</span>
+    </button>
+    <button id="bo-3" class="bo-btn" cursor="pointer">
+      <span id="bo-3-text" class="bo-active">Bo3</span>
+    </button>
+    <button id="bo-5" class="bo-btn" cursor="pointer">
+      <span id="bo-5-text" class="bo-text">Bo5</span>
+    </button>
+    <button id="bo-7" class="bo-btn" cursor="pointer">
+      <span id="bo-7-text" class="bo-text">Bo7</span>
+    </button>
+  </div>
   <span class="section-divider">── OR ──</span>
   <button id="local-2p" class="local-btn" cursor="pointer">
     <span class="local-text">2-PLAYER LOCAL</span>

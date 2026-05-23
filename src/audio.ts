@@ -5,6 +5,8 @@ export class AudioManager {
   sfxGain: GainNode | null = null;
   musicGain: GainNode | null = null;
   ambientOsc: OscillatorNode | null = null;
+  private ambientPadOsc: OscillatorNode | null = null;
+  private ambientPadFilter: BiquadFilterNode | null = null;
 
   masterVolume: number = 0.7;
   sfxVolume: number = 0.8;
@@ -59,6 +61,8 @@ export class AudioManager {
     padFilter.connect(padGain);
     padGain.connect(this.musicGain!);
     pad.start();
+    this.ambientPadOsc = pad;
+    this.ambientPadFilter = padFilter;
 
     // Slow LFO on pad
     const lfo = ctx.createOscillator();
@@ -402,5 +406,24 @@ export class AudioManager {
   setMusicVolume(v: number): void {
     this.musicVolume = v;
     if (this.musicGain) this.musicGain.gain.value = v;
+  }
+
+  // Shift ambient music mood to match a theme
+  setAmbientMood(baseFreq: number, padFreq: number, filterFreq: number): void {
+    if (this.ambientOsc) {
+      this.ambientOsc.frequency.linearRampToValueAtTime(
+        baseFreq, this.ctx!.currentTime + 2.0
+      );
+    }
+    if (this.ambientPadOsc) {
+      this.ambientPadOsc.frequency.linearRampToValueAtTime(
+        padFreq, this.ctx!.currentTime + 2.0
+      );
+    }
+    if (this.ambientPadFilter) {
+      this.ambientPadFilter.frequency.linearRampToValueAtTime(
+        filterFreq, this.ctx!.currentTime + 2.0
+      );
+    }
   }
 }

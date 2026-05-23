@@ -274,6 +274,9 @@ export class PhysicsEngine {
         ball.angularVelocity.set(0, 0, 0);
         this.pocketedThisShot.push(ball.id);
 
+        // Start pocket drop animation
+        this.ballManager.startPocketAnimation(ball, pp);
+
         if (ball.id === CUE_BALL_ID) {
           this.cueBallPocketed = true;
           audio.playScratch();

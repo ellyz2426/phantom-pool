@@ -134,6 +134,17 @@ async function main() {
   themeManager.onChange((theme: ThemeColors) => {
     ui.updateThemeLabel(theme.name);
     applyTheme(world, theme);
+    // Shift ambient music to match theme mood
+    const moodMap: Record<string, [number, number, number]> = {
+      cyan:   [55, 110, 200],
+      pink:   [65, 130, 250],
+      gold:   [50, 100, 180],
+      purple: [48, 96, 160],
+      blood:  [42, 84, 140],
+      frost:  [60, 120, 220],
+    };
+    const mood = moodMap[theme.id] || [55, 110, 200];
+    audioManager.setAmbientMood(mood[0], mood[1], mood[2]);
   });
   // Apply initial theme
   applyTheme(world, themeManager.current);
@@ -227,6 +238,14 @@ async function main() {
       if (gameManager.state === 'aiming' || gameManager.state === 'title') {
         themeManager.cycleTheme();
       }
+    } else if (e.key === 'n' || e.key === 'N') {
+      // Skip trick shot
+      if (gameManager.mode === 'trickshot' && gameManager.state === 'aiming') {
+        gameManager.skipTrickShot();
+      }
+    } else if (e.key === 'r' && gameManager.mode === 'trickshot' && gameManager.state === 'aiming') {
+      // Retry current trick shot
+      gameManager.retryTrickShot();
     } else if (e.key === '1') {
       cameraCtrl.setMode('orbit');
       ui.updateCameraMode(cameraCtrl.getModeName());
