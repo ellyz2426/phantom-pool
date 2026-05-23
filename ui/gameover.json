@@ -1,0 +1,421 @@
+{
+  "element": {
+    "type": "container",
+    "sourceTag": "div",
+    "children": [
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "GAME OVER"
+        ],
+        "properties": {
+          "class": "go-title"
+        },
+        "dataUid": "uid-2"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "Player 1 Wins!"
+        ],
+        "properties": {
+          "id": "winner-text",
+          "class": "winner-text"
+        },
+        "dataUid": "uid-3"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "Shots: 0 | Best Streak: 0"
+        ],
+        "properties": {
+          "id": "stats-text",
+          "class": "stats-text"
+        },
+        "dataUid": "uid-4"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [],
+        "properties": {
+          "id": "detail-text",
+          "class": "detail-text"
+        },
+        "dataUid": "uid-5"
+      },
+      {
+        "sourceTag": "button",
+        "type": "custom",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "PLAY AGAIN"
+            ],
+            "properties": {
+              "class": "btn-text"
+            },
+            "dataUid": "uid-7"
+          }
+        ],
+        "properties": {
+          "id": "replay-btn",
+          "class": "go-btn",
+          "cursor": "pointer"
+        },
+        "dataUid": "uid-6"
+      },
+      {
+        "sourceTag": "button",
+        "type": "custom",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "⚡ QUICK REMATCH"
+            ],
+            "properties": {
+              "class": "btn-text"
+            },
+            "dataUid": "uid-9"
+          }
+        ],
+        "properties": {
+          "id": "rematch-btn",
+          "class": "go-btn",
+          "cursor": "pointer"
+        },
+        "dataUid": "uid-8"
+      },
+      {
+        "sourceTag": "button",
+        "type": "custom",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "📹 REPLAY LAST SHOT"
+            ],
+            "properties": {
+              "class": "btn-text"
+            },
+            "dataUid": "uid-11"
+          }
+        ],
+        "properties": {
+          "id": "watch-replay-btn",
+          "class": "go-btn",
+          "cursor": "pointer"
+        },
+        "dataUid": "uid-10"
+      },
+      {
+        "sourceTag": "button",
+        "type": "custom",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "MAIN MENU"
+            ],
+            "properties": {
+              "class": "btn-text"
+            },
+            "dataUid": "uid-13"
+          }
+        ],
+        "properties": {
+          "id": "menu-btn",
+          "class": "go-btn",
+          "cursor": "pointer"
+        },
+        "dataUid": "uid-12"
+      }
+    ],
+    "properties": {
+      "class": "gameover-panel"
+    },
+    "dataUid": "uid-1"
+  },
+  "classes": {
+    "gameover-panel": {
+      "content": {
+        "display": "flex",
+        "flexDirection": "column",
+        "alignItems": "center",
+        "paddingTop": "2",
+        "paddingBottom": "2",
+        "paddingLeft": "3",
+        "paddingRight": "3",
+        "backgroundColor": "rgba(0, 5, 15, 0.95)",
+        "borderColor": "#00ffcc",
+        "borderWidth": "0.15",
+        "borderRadius": 1.5,
+        "gap": "1"
+      }
+    },
+    "go-title": {
+      "content": {
+        "fontSize": "3",
+        "color": "#00ffdd",
+        "fontWeight": "bold"
+      }
+    },
+    "winner-text": {
+      "content": {
+        "fontSize": "2",
+        "color": "#ffaa00"
+      }
+    },
+    "stats-text": {
+      "content": {
+        "fontSize": "1.2",
+        "color": "#88aacc"
+      }
+    },
+    "detail-text": {
+      "content": {
+        "fontSize": "1",
+        "color": "#668899"
+      }
+    },
+    "go-btn": {
+      "content": {
+        "display": "flex",
+        "alignItems": "center",
+        "justifyContent": "center",
+        "paddingTop": "0.7",
+        "paddingBottom": "0.7",
+        "paddingLeft": "3",
+        "paddingRight": "3",
+        "backgroundColor": "rgba(0, 50, 80, 0.6)",
+        "borderColor": "#00bbdd",
+        "borderWidth": "0.06",
+        "borderRadius": 0.5,
+        "cursor": "pointer",
+        "minWidth": "14",
+        "hover": {
+          "backgroundColor": "rgba(0, 80, 120, 0.8)"
+        }
+      }
+    },
+    "btn-text": {
+      "content": {
+        "fontSize": "1.8",
+        "color": "#00ddff",
+        "fontWeight": "bold"
+      }
+    }
+  },
+  "ranges": {
+    "gameover-panel": {
+      "start": {
+        "line": 1,
+        "column": 2
+      },
+      "end": {
+        "line": 1,
+        "column": 17
+      }
+    },
+    "go-title": {
+      "start": {
+        "line": 15,
+        "column": 2
+      },
+      "end": {
+        "line": 15,
+        "column": 11
+      }
+    },
+    "winner-text": {
+      "start": {
+        "line": 20,
+        "column": 2
+      },
+      "end": {
+        "line": 20,
+        "column": 14
+      }
+    },
+    "stats-text": {
+      "start": {
+        "line": 24,
+        "column": 2
+      },
+      "end": {
+        "line": 24,
+        "column": 13
+      }
+    },
+    "detail-text": {
+      "start": {
+        "line": 28,
+        "column": 2
+      },
+      "end": {
+        "line": 28,
+        "column": 14
+      }
+    },
+    "go-btn": {
+      "start": {
+        "line": 32,
+        "column": 2
+      },
+      "end": {
+        "line": 32,
+        "column": 9
+      }
+    },
+    "btn-text": {
+      "start": {
+        "line": 50,
+        "column": 2
+      },
+      "end": {
+        "line": 50,
+        "column": 11
+      }
+    },
+    "uid-1": {
+      "start": {
+        "line": 56,
+        "column": 0
+      },
+      "end": {
+        "line": 73,
+        "column": 6
+      }
+    },
+    "uid-2": {
+      "start": {
+        "line": 57,
+        "column": 2
+      },
+      "end": {
+        "line": 57,
+        "column": 41
+      }
+    },
+    "uid-3": {
+      "start": {
+        "line": 58,
+        "column": 2
+      },
+      "end": {
+        "line": 58,
+        "column": 66
+      }
+    },
+    "uid-4": {
+      "start": {
+        "line": 59,
+        "column": 2
+      },
+      "end": {
+        "line": 59,
+        "column": 75
+      }
+    },
+    "uid-5": {
+      "start": {
+        "line": 60,
+        "column": 2
+      },
+      "end": {
+        "line": 60,
+        "column": 52
+      }
+    },
+    "uid-6": {
+      "start": {
+        "line": 61,
+        "column": 2
+      },
+      "end": {
+        "line": 63,
+        "column": 11
+      }
+    },
+    "uid-7": {
+      "start": {
+        "line": 62,
+        "column": 4
+      },
+      "end": {
+        "line": 62,
+        "column": 44
+      }
+    },
+    "uid-8": {
+      "start": {
+        "line": 64,
+        "column": 2
+      },
+      "end": {
+        "line": 66,
+        "column": 11
+      }
+    },
+    "uid-9": {
+      "start": {
+        "line": 65,
+        "column": 4
+      },
+      "end": {
+        "line": 65,
+        "column": 49
+      }
+    },
+    "uid-10": {
+      "start": {
+        "line": 67,
+        "column": 2
+      },
+      "end": {
+        "line": 69,
+        "column": 11
+      }
+    },
+    "uid-11": {
+      "start": {
+        "line": 68,
+        "column": 4
+      },
+      "end": {
+        "line": 68,
+        "column": 53
+      }
+    },
+    "uid-12": {
+      "start": {
+        "line": 70,
+        "column": 2
+      },
+      "end": {
+        "line": 72,
+        "column": 11
+      }
+    },
+    "uid-13": {
+      "start": {
+        "line": 71,
+        "column": 4
+      },
+      "end": {
+        "line": 71,
+        "column": 43
+      }
+    }
+  }
+}

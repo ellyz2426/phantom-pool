@@ -1,0 +1,242 @@
+{
+  "element": {
+    "type": "container",
+    "sourceTag": "div",
+    "children": [
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "🏆"
+        ],
+        "properties": {
+          "id": "ach-icon",
+          "class": "achievement-icon"
+        },
+        "dataUid": "uid-2"
+      },
+      {
+        "type": "container",
+        "sourceTag": "div",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "ACHIEVEMENT UNLOCKED"
+            ],
+            "properties": {
+              "class": "achievement-header"
+            },
+            "dataUid": "uid-4"
+          },
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "Winner"
+            ],
+            "properties": {
+              "id": "ach-name",
+              "class": "achievement-name"
+            },
+            "dataUid": "uid-5"
+          },
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "Win your first game"
+            ],
+            "properties": {
+              "id": "ach-desc",
+              "class": "achievement-desc"
+            },
+            "dataUid": "uid-6"
+          }
+        ],
+        "properties": {
+          "class": "achievement-info"
+        },
+        "dataUid": "uid-3"
+      }
+    ],
+    "properties": {
+      "class": "achievement-toast"
+    },
+    "dataUid": "uid-1"
+  },
+  "classes": {
+    "achievement-toast": {
+      "content": {
+        "display": "flex",
+        "flexDirection": "row",
+        "alignItems": "center",
+        "paddingTop": "0.6",
+        "paddingBottom": "0.6",
+        "paddingLeft": "1.5",
+        "paddingRight": "1.5",
+        "backgroundColor": "rgba(20, 10, 0, 0.92)",
+        "borderColor": "#ffaa00",
+        "borderWidth": "0.1",
+        "borderRadius": 0.6,
+        "gap": "1"
+      }
+    },
+    "achievement-icon": {
+      "content": {
+        "fontSize": "2.5",
+        "color": "#ffaa00"
+      }
+    },
+    "achievement-info": {
+      "content": {
+        "display": "flex",
+        "flexDirection": "column",
+        "gap": "0.2"
+      }
+    },
+    "achievement-header": {
+      "content": {
+        "fontSize": "1",
+        "color": "#ffaa00",
+        "fontWeight": "bold"
+      }
+    },
+    "achievement-name": {
+      "content": {
+        "fontSize": "1.6",
+        "color": "#ffffff",
+        "fontWeight": "bold"
+      }
+    },
+    "achievement-desc": {
+      "content": {
+        "fontSize": "0.9",
+        "color": "#aa8844"
+      }
+    }
+  },
+  "ranges": {
+    "achievement-toast": {
+      "start": {
+        "line": 1,
+        "column": 2
+      },
+      "end": {
+        "line": 1,
+        "column": 20
+      }
+    },
+    "achievement-icon": {
+      "start": {
+        "line": 15,
+        "column": 2
+      },
+      "end": {
+        "line": 15,
+        "column": 19
+      }
+    },
+    "achievement-info": {
+      "start": {
+        "line": 19,
+        "column": 2
+      },
+      "end": {
+        "line": 19,
+        "column": 19
+      }
+    },
+    "achievement-header": {
+      "start": {
+        "line": 24,
+        "column": 2
+      },
+      "end": {
+        "line": 24,
+        "column": 21
+      }
+    },
+    "achievement-name": {
+      "start": {
+        "line": 29,
+        "column": 2
+      },
+      "end": {
+        "line": 29,
+        "column": 19
+      }
+    },
+    "achievement-desc": {
+      "start": {
+        "line": 34,
+        "column": 2
+      },
+      "end": {
+        "line": 34,
+        "column": 19
+      }
+    },
+    "uid-1": {
+      "start": {
+        "line": 39,
+        "column": 0
+      },
+      "end": {
+        "line": 46,
+        "column": 6
+      }
+    },
+    "uid-2": {
+      "start": {
+        "line": 40,
+        "column": 2
+      },
+      "end": {
+        "line": 40,
+        "column": 56
+      }
+    },
+    "uid-3": {
+      "start": {
+        "line": 41,
+        "column": 2
+      },
+      "end": {
+        "line": 45,
+        "column": 8
+      }
+    },
+    "uid-4": {
+      "start": {
+        "line": 42,
+        "column": 4
+      },
+      "end": {
+        "line": 42,
+        "column": 64
+      }
+    },
+    "uid-5": {
+      "start": {
+        "line": 43,
+        "column": 4
+      },
+      "end": {
+        "line": 43,
+        "column": 62
+      }
+    },
+    "uid-6": {
+      "start": {
+        "line": 44,
+        "column": 4
+      },
+      "end": {
+        "line": 44,
+        "column": 75
+      }
+    }
+  }
+}

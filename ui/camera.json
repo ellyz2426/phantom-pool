@@ -1,0 +1,164 @@
+{
+  "element": {
+    "type": "container",
+    "sourceTag": "div",
+    "children": [
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "CAM:"
+        ],
+        "properties": {
+          "class": "cam-label"
+        },
+        "dataUid": "uid-2"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "FREE ORBIT"
+        ],
+        "properties": {
+          "id": "cam-mode-text",
+          "class": "cam-mode"
+        },
+        "dataUid": "uid-3"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "[C]"
+        ],
+        "properties": {
+          "class": "cam-hint"
+        },
+        "dataUid": "uid-4"
+      }
+    ],
+    "properties": {
+      "class": "camera-panel"
+    },
+    "dataUid": "uid-1"
+  },
+  "classes": {
+    "camera-panel": {
+      "content": {
+        "display": "flex",
+        "flexDirection": "row",
+        "paddingTop": "0.4",
+        "paddingBottom": "0.4",
+        "paddingLeft": "1",
+        "paddingRight": "1",
+        "backgroundColor": "rgba(0, 5, 15, 0.6)",
+        "borderColor": "#335566",
+        "borderWidth": "0.04",
+        "borderRadius": 0.3,
+        "gap": "0.8"
+      }
+    },
+    "cam-label": {
+      "content": {
+        "fontSize": "0.9",
+        "color": "#5588aa"
+      }
+    },
+    "cam-mode": {
+      "content": {
+        "fontSize": "0.9",
+        "color": "#00ddff",
+        "fontWeight": "bold"
+      }
+    },
+    "cam-hint": {
+      "content": {
+        "fontSize": "0.7",
+        "color": "#334455"
+      }
+    }
+  },
+  "ranges": {
+    "camera-panel": {
+      "start": {
+        "line": 1,
+        "column": 2
+      },
+      "end": {
+        "line": 1,
+        "column": 15
+      }
+    },
+    "cam-label": {
+      "start": {
+        "line": 14,
+        "column": 2
+      },
+      "end": {
+        "line": 14,
+        "column": 12
+      }
+    },
+    "cam-mode": {
+      "start": {
+        "line": 18,
+        "column": 2
+      },
+      "end": {
+        "line": 18,
+        "column": 11
+      }
+    },
+    "cam-hint": {
+      "start": {
+        "line": 23,
+        "column": 2
+      },
+      "end": {
+        "line": 23,
+        "column": 11
+      }
+    },
+    "uid-1": {
+      "start": {
+        "line": 28,
+        "column": 0
+      },
+      "end": {
+        "line": 32,
+        "column": 6
+      }
+    },
+    "uid-2": {
+      "start": {
+        "line": 29,
+        "column": 2
+      },
+      "end": {
+        "line": 29,
+        "column": 37
+      }
+    },
+    "uid-3": {
+      "start": {
+        "line": 30,
+        "column": 2
+      },
+      "end": {
+        "line": 30,
+        "column": 61
+      }
+    },
+    "uid-4": {
+      "start": {
+        "line": 31,
+        "column": 2
+      },
+      "end": {
+        "line": 31,
+        "column": 35
+      }
+    }
+  }
+}

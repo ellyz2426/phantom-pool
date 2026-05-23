@@ -1,0 +1,1097 @@
+{
+  "element": {
+    "type": "container",
+    "sourceTag": "div",
+    "children": [
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "🏆 TOURNAMENT"
+        ],
+        "properties": {
+          "class": "tourn-title"
+        },
+        "dataUid": "uid-2"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "QUARTERFINAL"
+        ],
+        "properties": {
+          "id": "round-label",
+          "class": "tourn-round"
+        },
+        "dataUid": "uid-3"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "8-Player Single Elimination"
+        ],
+        "properties": {
+          "id": "tourn-status",
+          "class": "tourn-status"
+        },
+        "dataUid": "uid-4"
+      },
+      {
+        "type": "container",
+        "sourceTag": "div",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "── QUARTERFINALS ──"
+            ],
+            "properties": {
+              "class": "round-label"
+            },
+            "dataUid": "uid-6"
+          },
+          {
+            "type": "container",
+            "sourceTag": "div",
+            "children": [
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "???"
+                ],
+                "properties": {
+                  "id": "qf-0a",
+                  "class": "match-player"
+                },
+                "dataUid": "uid-8"
+              },
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "vs"
+                ],
+                "properties": {
+                  "class": "match-vs"
+                },
+                "dataUid": "uid-9"
+              },
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "???"
+                ],
+                "properties": {
+                  "id": "qf-0b",
+                  "class": "match-player"
+                },
+                "dataUid": "uid-10"
+              }
+            ],
+            "properties": {
+              "class": "match-row"
+            },
+            "dataUid": "uid-7"
+          },
+          {
+            "type": "container",
+            "sourceTag": "div",
+            "children": [
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "???"
+                ],
+                "properties": {
+                  "id": "qf-1a",
+                  "class": "match-player"
+                },
+                "dataUid": "uid-12"
+              },
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "vs"
+                ],
+                "properties": {
+                  "class": "match-vs"
+                },
+                "dataUid": "uid-13"
+              },
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "???"
+                ],
+                "properties": {
+                  "id": "qf-1b",
+                  "class": "match-player"
+                },
+                "dataUid": "uid-14"
+              }
+            ],
+            "properties": {
+              "class": "match-row"
+            },
+            "dataUid": "uid-11"
+          },
+          {
+            "type": "container",
+            "sourceTag": "div",
+            "children": [
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "???"
+                ],
+                "properties": {
+                  "id": "qf-2a",
+                  "class": "match-player"
+                },
+                "dataUid": "uid-16"
+              },
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "vs"
+                ],
+                "properties": {
+                  "class": "match-vs"
+                },
+                "dataUid": "uid-17"
+              },
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "???"
+                ],
+                "properties": {
+                  "id": "qf-2b",
+                  "class": "match-player"
+                },
+                "dataUid": "uid-18"
+              }
+            ],
+            "properties": {
+              "class": "match-row"
+            },
+            "dataUid": "uid-15"
+          },
+          {
+            "type": "container",
+            "sourceTag": "div",
+            "children": [
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "???"
+                ],
+                "properties": {
+                  "id": "qf-3a",
+                  "class": "match-player"
+                },
+                "dataUid": "uid-20"
+              },
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "vs"
+                ],
+                "properties": {
+                  "class": "match-vs"
+                },
+                "dataUid": "uid-21"
+              },
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "???"
+                ],
+                "properties": {
+                  "id": "qf-3b",
+                  "class": "match-player"
+                },
+                "dataUid": "uid-22"
+              }
+            ],
+            "properties": {
+              "class": "match-row"
+            },
+            "dataUid": "uid-19"
+          },
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "── SEMIFINALS ──"
+            ],
+            "properties": {
+              "class": "round-label"
+            },
+            "dataUid": "uid-23"
+          },
+          {
+            "type": "container",
+            "sourceTag": "div",
+            "children": [
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "???"
+                ],
+                "properties": {
+                  "id": "sf-0a",
+                  "class": "match-player"
+                },
+                "dataUid": "uid-25"
+              },
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "vs"
+                ],
+                "properties": {
+                  "class": "match-vs"
+                },
+                "dataUid": "uid-26"
+              },
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "???"
+                ],
+                "properties": {
+                  "id": "sf-0b",
+                  "class": "match-player"
+                },
+                "dataUid": "uid-27"
+              }
+            ],
+            "properties": {
+              "class": "match-row"
+            },
+            "dataUid": "uid-24"
+          },
+          {
+            "type": "container",
+            "sourceTag": "div",
+            "children": [
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "???"
+                ],
+                "properties": {
+                  "id": "sf-1a",
+                  "class": "match-player"
+                },
+                "dataUid": "uid-29"
+              },
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "vs"
+                ],
+                "properties": {
+                  "class": "match-vs"
+                },
+                "dataUid": "uid-30"
+              },
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "???"
+                ],
+                "properties": {
+                  "id": "sf-1b",
+                  "class": "match-player"
+                },
+                "dataUid": "uid-31"
+              }
+            ],
+            "properties": {
+              "class": "match-row"
+            },
+            "dataUid": "uid-28"
+          },
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "── FINAL ──"
+            ],
+            "properties": {
+              "class": "round-label"
+            },
+            "dataUid": "uid-32"
+          },
+          {
+            "type": "container",
+            "sourceTag": "div",
+            "children": [
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "???"
+                ],
+                "properties": {
+                  "id": "fi-0a",
+                  "class": "match-player"
+                },
+                "dataUid": "uid-34"
+              },
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "vs"
+                ],
+                "properties": {
+                  "class": "match-vs"
+                },
+                "dataUid": "uid-35"
+              },
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "???"
+                ],
+                "properties": {
+                  "id": "fi-0b",
+                  "class": "match-player"
+                },
+                "dataUid": "uid-36"
+              }
+            ],
+            "properties": {
+              "class": "match-row"
+            },
+            "dataUid": "uid-33"
+          }
+        ],
+        "properties": {
+          "class": "bracket-section"
+        },
+        "dataUid": "uid-5"
+      },
+      {
+        "type": "container",
+        "sourceTag": "div",
+        "children": [
+          {
+            "type": "container",
+            "sourceTag": "div",
+            "children": [
+              "PLAY MATCH"
+            ],
+            "properties": {
+              "id": "play-match-btn",
+              "class": "tourn-btn",
+              "cursor": "pointer"
+            },
+            "dataUid": "uid-38"
+          },
+          {
+            "type": "container",
+            "sourceTag": "div",
+            "children": [
+              "← QUIT"
+            ],
+            "properties": {
+              "id": "back-btn",
+              "class": "back-btn",
+              "cursor": "pointer"
+            },
+            "dataUid": "uid-39"
+          }
+        ],
+        "properties": {
+          "class": "btn-row"
+        },
+        "dataUid": "uid-37"
+      }
+    ],
+    "properties": {
+      "class": "tournament-panel"
+    },
+    "dataUid": "uid-1"
+  },
+  "classes": {
+    "tournament-panel": {
+      "content": {
+        "display": "flex",
+        "flexDirection": "column",
+        "alignItems": "center",
+        "padding": "3",
+        "backgroundColor": "rgba(0, 0, 0, 0.92)",
+        "borderColor": "#ffaa00",
+        "borderWidth": "0.15",
+        "borderRadius": 1.5,
+        "gap": "1"
+      }
+    },
+    "tourn-title": {
+      "content": {
+        "fontSize": "3",
+        "color": "#ffaa00",
+        "fontWeight": "bold"
+      }
+    },
+    "tourn-round": {
+      "content": {
+        "fontSize": "2",
+        "color": "#00ffcc",
+        "fontWeight": "bold"
+      }
+    },
+    "tourn-status": {
+      "content": {
+        "fontSize": "1.5",
+        "color": "#cccccc"
+      }
+    },
+    "bracket-section": {
+      "content": {
+        "display": "flex",
+        "flexDirection": "column",
+        "gap": "0.3",
+        "padding": "1",
+        "width": "100%"
+      }
+    },
+    "round-label": {
+      "content": {
+        "fontSize": "1.5",
+        "color": "#ffaa00",
+        "fontWeight": "bold"
+      }
+    },
+    "match-row": {
+      "content": {
+        "display": "flex",
+        "flexDirection": "row",
+        "gap": "1",
+        "padding": "0.5",
+        "backgroundColor": "rgba(255, 170, 0, 0.05)",
+        "borderRadius": 0.5
+      }
+    },
+    "match-player": {
+      "content": {
+        "fontSize": "1.3",
+        "color": "#cccccc",
+        "flex": "1"
+      }
+    },
+    "match-player-you": {
+      "content": {
+        "fontSize": "1.3",
+        "color": "#00ffcc",
+        "fontWeight": "bold",
+        "flex": "1"
+      }
+    },
+    "match-winner": {
+      "content": {
+        "fontSize": "1.3",
+        "color": "#ffaa00",
+        "fontWeight": "bold",
+        "flex": "1"
+      }
+    },
+    "match-vs": {
+      "content": {
+        "fontSize": "1.2",
+        "color": "#666666"
+      }
+    },
+    "btn-row": {
+      "content": {
+        "display": "flex",
+        "flexDirection": "row",
+        "gap": "2",
+        "padding": "1"
+      }
+    },
+    "tourn-btn": {
+      "content": {
+        "fontSize": "1.8",
+        "color": "#ffaa00",
+        "padding": "1 2",
+        "cursor": "pointer",
+        "borderColor": "#ffaa00",
+        "borderWidth": "0.08",
+        "borderRadius": 0.5,
+        "backgroundColor": "rgba(255, 170, 0, 0.1)",
+        "hover": {
+          "backgroundColor": "rgba(255, 170, 0, 0.25)"
+        }
+      }
+    },
+    "back-btn": {
+      "content": {
+        "fontSize": "1.5",
+        "color": "#888888",
+        "padding": "0.8",
+        "cursor": "pointer",
+        "hover": {
+          "color": "#ffffff"
+        }
+      }
+    }
+  },
+  "ranges": {
+    "tournament-panel": {
+      "start": {
+        "line": 2,
+        "column": 2
+      },
+      "end": {
+        "line": 2,
+        "column": 19
+      }
+    },
+    "tourn-title": {
+      "start": {
+        "line": 13,
+        "column": 2
+      },
+      "end": {
+        "line": 13,
+        "column": 14
+      }
+    },
+    "tourn-round": {
+      "start": {
+        "line": 18,
+        "column": 2
+      },
+      "end": {
+        "line": 18,
+        "column": 14
+      }
+    },
+    "tourn-status": {
+      "start": {
+        "line": 23,
+        "column": 2
+      },
+      "end": {
+        "line": 23,
+        "column": 15
+      }
+    },
+    "bracket-section": {
+      "start": {
+        "line": 27,
+        "column": 2
+      },
+      "end": {
+        "line": 27,
+        "column": 18
+      }
+    },
+    "round-label": {
+      "start": {
+        "line": 34,
+        "column": 2
+      },
+      "end": {
+        "line": 34,
+        "column": 14
+      }
+    },
+    "match-row": {
+      "start": {
+        "line": 39,
+        "column": 2
+      },
+      "end": {
+        "line": 39,
+        "column": 12
+      }
+    },
+    "match-player": {
+      "start": {
+        "line": 47,
+        "column": 2
+      },
+      "end": {
+        "line": 47,
+        "column": 15
+      }
+    },
+    "match-player-you": {
+      "start": {
+        "line": 52,
+        "column": 2
+      },
+      "end": {
+        "line": 52,
+        "column": 19
+      }
+    },
+    "match-winner": {
+      "start": {
+        "line": 58,
+        "column": 2
+      },
+      "end": {
+        "line": 58,
+        "column": 15
+      }
+    },
+    "match-vs": {
+      "start": {
+        "line": 64,
+        "column": 2
+      },
+      "end": {
+        "line": 64,
+        "column": 11
+      }
+    },
+    "btn-row": {
+      "start": {
+        "line": 68,
+        "column": 2
+      },
+      "end": {
+        "line": 68,
+        "column": 10
+      }
+    },
+    "tourn-btn": {
+      "start": {
+        "line": 74,
+        "column": 2
+      },
+      "end": {
+        "line": 74,
+        "column": 12
+      }
+    },
+    "back-btn": {
+      "start": {
+        "line": 87,
+        "column": 2
+      },
+      "end": {
+        "line": 87,
+        "column": 11
+      }
+    },
+    "uid-1": {
+      "start": {
+        "line": 95,
+        "column": 0
+      },
+      "end": {
+        "line": 115,
+        "column": 6
+      }
+    },
+    "uid-2": {
+      "start": {
+        "line": 96,
+        "column": 2
+      },
+      "end": {
+        "line": 96,
+        "column": 48
+      }
+    },
+    "uid-3": {
+      "start": {
+        "line": 97,
+        "column": 2
+      },
+      "end": {
+        "line": 97,
+        "column": 64
+      }
+    },
+    "uid-4": {
+      "start": {
+        "line": 98,
+        "column": 2
+      },
+      "end": {
+        "line": 98,
+        "column": 81
+      }
+    },
+    "uid-5": {
+      "start": {
+        "line": 99,
+        "column": 2
+      },
+      "end": {
+        "line": 110,
+        "column": 8
+      }
+    },
+    "uid-6": {
+      "start": {
+        "line": 100,
+        "column": 4
+      },
+      "end": {
+        "line": 100,
+        "column": 56
+      }
+    },
+    "uid-7": {
+      "start": {
+        "line": 101,
+        "column": 4
+      },
+      "end": {
+        "line": 101,
+        "column": 161
+      }
+    },
+    "uid-8": {
+      "start": {
+        "line": 101,
+        "column": 27
+      },
+      "end": {
+        "line": 101,
+        "column": 75
+      }
+    },
+    "uid-9": {
+      "start": {
+        "line": 101,
+        "column": 75
+      },
+      "end": {
+        "line": 101,
+        "column": 107
+      }
+    },
+    "uid-10": {
+      "start": {
+        "line": 101,
+        "column": 107
+      },
+      "end": {
+        "line": 101,
+        "column": 155
+      }
+    },
+    "uid-11": {
+      "start": {
+        "line": 102,
+        "column": 4
+      },
+      "end": {
+        "line": 102,
+        "column": 161
+      }
+    },
+    "uid-12": {
+      "start": {
+        "line": 102,
+        "column": 27
+      },
+      "end": {
+        "line": 102,
+        "column": 75
+      }
+    },
+    "uid-13": {
+      "start": {
+        "line": 102,
+        "column": 75
+      },
+      "end": {
+        "line": 102,
+        "column": 107
+      }
+    },
+    "uid-14": {
+      "start": {
+        "line": 102,
+        "column": 107
+      },
+      "end": {
+        "line": 102,
+        "column": 155
+      }
+    },
+    "uid-15": {
+      "start": {
+        "line": 103,
+        "column": 4
+      },
+      "end": {
+        "line": 103,
+        "column": 161
+      }
+    },
+    "uid-16": {
+      "start": {
+        "line": 103,
+        "column": 27
+      },
+      "end": {
+        "line": 103,
+        "column": 75
+      }
+    },
+    "uid-17": {
+      "start": {
+        "line": 103,
+        "column": 75
+      },
+      "end": {
+        "line": 103,
+        "column": 107
+      }
+    },
+    "uid-18": {
+      "start": {
+        "line": 103,
+        "column": 107
+      },
+      "end": {
+        "line": 103,
+        "column": 155
+      }
+    },
+    "uid-19": {
+      "start": {
+        "line": 104,
+        "column": 4
+      },
+      "end": {
+        "line": 104,
+        "column": 161
+      }
+    },
+    "uid-20": {
+      "start": {
+        "line": 104,
+        "column": 27
+      },
+      "end": {
+        "line": 104,
+        "column": 75
+      }
+    },
+    "uid-21": {
+      "start": {
+        "line": 104,
+        "column": 75
+      },
+      "end": {
+        "line": 104,
+        "column": 107
+      }
+    },
+    "uid-22": {
+      "start": {
+        "line": 104,
+        "column": 107
+      },
+      "end": {
+        "line": 104,
+        "column": 155
+      }
+    },
+    "uid-23": {
+      "start": {
+        "line": 105,
+        "column": 4
+      },
+      "end": {
+        "line": 105,
+        "column": 53
+      }
+    },
+    "uid-24": {
+      "start": {
+        "line": 106,
+        "column": 4
+      },
+      "end": {
+        "line": 106,
+        "column": 161
+      }
+    },
+    "uid-25": {
+      "start": {
+        "line": 106,
+        "column": 27
+      },
+      "end": {
+        "line": 106,
+        "column": 75
+      }
+    },
+    "uid-26": {
+      "start": {
+        "line": 106,
+        "column": 75
+      },
+      "end": {
+        "line": 106,
+        "column": 107
+      }
+    },
+    "uid-27": {
+      "start": {
+        "line": 106,
+        "column": 107
+      },
+      "end": {
+        "line": 106,
+        "column": 155
+      }
+    },
+    "uid-28": {
+      "start": {
+        "line": 107,
+        "column": 4
+      },
+      "end": {
+        "line": 107,
+        "column": 161
+      }
+    },
+    "uid-29": {
+      "start": {
+        "line": 107,
+        "column": 27
+      },
+      "end": {
+        "line": 107,
+        "column": 75
+      }
+    },
+    "uid-30": {
+      "start": {
+        "line": 107,
+        "column": 75
+      },
+      "end": {
+        "line": 107,
+        "column": 107
+      }
+    },
+    "uid-31": {
+      "start": {
+        "line": 107,
+        "column": 107
+      },
+      "end": {
+        "line": 107,
+        "column": 155
+      }
+    },
+    "uid-32": {
+      "start": {
+        "line": 108,
+        "column": 4
+      },
+      "end": {
+        "line": 108,
+        "column": 48
+      }
+    },
+    "uid-33": {
+      "start": {
+        "line": 109,
+        "column": 4
+      },
+      "end": {
+        "line": 109,
+        "column": 161
+      }
+    },
+    "uid-34": {
+      "start": {
+        "line": 109,
+        "column": 27
+      },
+      "end": {
+        "line": 109,
+        "column": 75
+      }
+    },
+    "uid-35": {
+      "start": {
+        "line": 109,
+        "column": 75
+      },
+      "end": {
+        "line": 109,
+        "column": 107
+      }
+    },
+    "uid-36": {
+      "start": {
+        "line": 109,
+        "column": 107
+      },
+      "end": {
+        "line": 109,
+        "column": 155
+      }
+    },
+    "uid-37": {
+      "start": {
+        "line": 111,
+        "column": 2
+      },
+      "end": {
+        "line": 114,
+        "column": 8
+      }
+    },
+    "uid-38": {
+      "start": {
+        "line": 112,
+        "column": 4
+      },
+      "end": {
+        "line": 112,
+        "column": 80
+      }
+    },
+    "uid-39": {
+      "start": {
+        "line": 113,
+        "column": 4
+      },
+      "end": {
+        "line": 113,
+        "column": 69
+      }
+    }
+  }
+}

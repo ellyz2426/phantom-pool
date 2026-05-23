@@ -1,0 +1,165 @@
+{
+  "element": {
+    "type": "container",
+    "sourceTag": "div",
+    "children": [
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "ENGLISH"
+        ],
+        "properties": {
+          "class": "spin-label"
+        },
+        "dataUid": "uid-2"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "CENTER"
+        ],
+        "properties": {
+          "id": "spin-text",
+          "class": "spin-value"
+        },
+        "dataUid": "uid-3"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [
+          "Arrow keys / L-Stick"
+        ],
+        "properties": {
+          "class": "spin-hint"
+        },
+        "dataUid": "uid-4"
+      }
+    ],
+    "properties": {
+      "class": "spin-panel"
+    },
+    "dataUid": "uid-1"
+  },
+  "classes": {
+    "spin-panel": {
+      "content": {
+        "display": "flex",
+        "flexDirection": "column",
+        "alignItems": "center",
+        "paddingTop": "0.5",
+        "paddingBottom": "0.5",
+        "paddingLeft": "1",
+        "paddingRight": "1",
+        "backgroundColor": "rgba(0, 5, 15, 0.75)",
+        "borderColor": "#664400",
+        "borderWidth": "0.05",
+        "borderRadius": 0.4,
+        "gap": "0.2"
+      }
+    },
+    "spin-label": {
+      "content": {
+        "fontSize": "0.8",
+        "color": "#886644"
+      }
+    },
+    "spin-value": {
+      "content": {
+        "fontSize": "1",
+        "color": "#ffaa00",
+        "fontWeight": "bold"
+      }
+    },
+    "spin-hint": {
+      "content": {
+        "fontSize": "0.6",
+        "color": "#444444"
+      }
+    }
+  },
+  "ranges": {
+    "spin-panel": {
+      "start": {
+        "line": 1,
+        "column": 2
+      },
+      "end": {
+        "line": 1,
+        "column": 13
+      }
+    },
+    "spin-label": {
+      "start": {
+        "line": 15,
+        "column": 2
+      },
+      "end": {
+        "line": 15,
+        "column": 13
+      }
+    },
+    "spin-value": {
+      "start": {
+        "line": 19,
+        "column": 2
+      },
+      "end": {
+        "line": 19,
+        "column": 13
+      }
+    },
+    "spin-hint": {
+      "start": {
+        "line": 24,
+        "column": 2
+      },
+      "end": {
+        "line": 24,
+        "column": 12
+      }
+    },
+    "uid-1": {
+      "start": {
+        "line": 29,
+        "column": 0
+      },
+      "end": {
+        "line": 33,
+        "column": 6
+      }
+    },
+    "uid-2": {
+      "start": {
+        "line": 30,
+        "column": 2
+      },
+      "end": {
+        "line": 30,
+        "column": 41
+      }
+    },
+    "uid-3": {
+      "start": {
+        "line": 31,
+        "column": 2
+      },
+      "end": {
+        "line": 31,
+        "column": 55
+      }
+    },
+    "uid-4": {
+      "start": {
+        "line": 32,
+        "column": 2
+      },
+      "end": {
+        "line": 32,
+        "column": 53
+      }
+    }
+  }
+}

@@ -1,0 +1,450 @@
+{
+  "element": {
+    "type": "container",
+    "sourceTag": "div",
+    "children": [
+      {
+        "type": "container",
+        "sourceTag": "div",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "Player 1"
+            ],
+            "properties": {
+              "id": "player-name",
+              "class": "player-text"
+            },
+            "dataUid": "uid-3"
+          },
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "8-BALL"
+            ],
+            "properties": {
+              "id": "mode-label",
+              "class": "mode-text"
+            },
+            "dataUid": "uid-4"
+          }
+        ],
+        "properties": {
+          "class": "hud-row"
+        },
+        "dataUid": "uid-2"
+      },
+      {
+        "type": "container",
+        "sourceTag": "div",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "Shots: 0"
+            ],
+            "properties": {
+              "id": "shots-count",
+              "class": "stat-text"
+            },
+            "dataUid": "uid-6"
+          },
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [],
+            "properties": {
+              "id": "assignment",
+              "class": "assignment-text"
+            },
+            "dataUid": "uid-7"
+          },
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [],
+            "properties": {
+              "id": "streak-label",
+              "class": "streak-text"
+            },
+            "dataUid": "uid-8"
+          }
+        ],
+        "properties": {
+          "class": "hud-row"
+        },
+        "dataUid": "uid-5"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [],
+        "properties": {
+          "id": "power-bar",
+          "class": "power-text"
+        },
+        "dataUid": "uid-9"
+      },
+      {
+        "type": "container",
+        "sourceTag": "div",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "Solids: 7"
+            ],
+            "properties": {
+              "id": "solids-count",
+              "class": "ball-count"
+            },
+            "dataUid": "uid-11"
+          },
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "Stripes: 7"
+            ],
+            "properties": {
+              "id": "stripes-count",
+              "class": "ball-count"
+            },
+            "dataUid": "uid-12"
+          }
+        ],
+        "properties": {
+          "class": "hud-row"
+        },
+        "dataUid": "uid-10"
+      },
+      {
+        "sourceTag": "span",
+        "type": "custom",
+        "children": [],
+        "properties": {
+          "id": "trick-progress",
+          "class": "trick-progress"
+        },
+        "dataUid": "uid-13"
+      }
+    ],
+    "properties": {
+      "class": "hud-panel"
+    },
+    "dataUid": "uid-1"
+  },
+  "classes": {
+    "hud-panel": {
+      "content": {
+        "display": "flex",
+        "flexDirection": "column",
+        "paddingTop": "0.8",
+        "paddingBottom": "0.8",
+        "paddingLeft": "1.5",
+        "paddingRight": "1.5",
+        "backgroundColor": "rgba(0, 5, 15, 0.8)",
+        "borderColor": "#00bbdd",
+        "borderWidth": "0.06",
+        "borderRadius": 0.5,
+        "gap": "0.3"
+      }
+    },
+    "hud-row": {
+      "content": {
+        "display": "flex",
+        "flexDirection": "row",
+        "gap": "1.5",
+        "alignItems": "center"
+      }
+    },
+    "player-text": {
+      "content": {
+        "fontSize": "1.4",
+        "color": "#00ffdd",
+        "fontWeight": "bold"
+      }
+    },
+    "mode-text": {
+      "content": {
+        "fontSize": "1",
+        "color": "#5588aa"
+      }
+    },
+    "stat-text": {
+      "content": {
+        "fontSize": "1",
+        "color": "#88aacc"
+      }
+    },
+    "streak-text": {
+      "content": {
+        "fontSize": "1",
+        "color": "#ff6600",
+        "fontWeight": "bold"
+      }
+    },
+    "assignment-text": {
+      "content": {
+        "fontSize": "1",
+        "color": "#ffaa00"
+      }
+    },
+    "power-text": {
+      "content": {
+        "fontSize": "0.8",
+        "color": "#ff6600",
+        "fontWeight": "bold"
+      }
+    },
+    "ball-count": {
+      "content": {
+        "fontSize": "0.9",
+        "color": "#88aacc"
+      }
+    },
+    "trick-progress": {
+      "content": {
+        "fontSize": "0.9",
+        "color": "#ff44cc"
+      }
+    }
+  },
+  "ranges": {
+    "hud-panel": {
+      "start": {
+        "line": 1,
+        "column": 2
+      },
+      "end": {
+        "line": 1,
+        "column": 12
+      }
+    },
+    "hud-row": {
+      "start": {
+        "line": 14,
+        "column": 2
+      },
+      "end": {
+        "line": 14,
+        "column": 10
+      }
+    },
+    "player-text": {
+      "start": {
+        "line": 20,
+        "column": 2
+      },
+      "end": {
+        "line": 20,
+        "column": 14
+      }
+    },
+    "mode-text": {
+      "start": {
+        "line": 25,
+        "column": 2
+      },
+      "end": {
+        "line": 25,
+        "column": 12
+      }
+    },
+    "stat-text": {
+      "start": {
+        "line": 29,
+        "column": 2
+      },
+      "end": {
+        "line": 29,
+        "column": 12
+      }
+    },
+    "streak-text": {
+      "start": {
+        "line": 33,
+        "column": 2
+      },
+      "end": {
+        "line": 33,
+        "column": 14
+      }
+    },
+    "assignment-text": {
+      "start": {
+        "line": 38,
+        "column": 2
+      },
+      "end": {
+        "line": 38,
+        "column": 18
+      }
+    },
+    "power-text": {
+      "start": {
+        "line": 42,
+        "column": 2
+      },
+      "end": {
+        "line": 42,
+        "column": 13
+      }
+    },
+    "ball-count": {
+      "start": {
+        "line": 47,
+        "column": 2
+      },
+      "end": {
+        "line": 47,
+        "column": 13
+      }
+    },
+    "trick-progress": {
+      "start": {
+        "line": 51,
+        "column": 2
+      },
+      "end": {
+        "line": 51,
+        "column": 17
+      }
+    },
+    "uid-1": {
+      "start": {
+        "line": 56,
+        "column": 0
+      },
+      "end": {
+        "line": 72,
+        "column": 6
+      }
+    },
+    "uid-2": {
+      "start": {
+        "line": 57,
+        "column": 2
+      },
+      "end": {
+        "line": 60,
+        "column": 8
+      }
+    },
+    "uid-3": {
+      "start": {
+        "line": 58,
+        "column": 4
+      },
+      "end": {
+        "line": 58,
+        "column": 62
+      }
+    },
+    "uid-4": {
+      "start": {
+        "line": 59,
+        "column": 4
+      },
+      "end": {
+        "line": 59,
+        "column": 57
+      }
+    },
+    "uid-5": {
+      "start": {
+        "line": 61,
+        "column": 2
+      },
+      "end": {
+        "line": 65,
+        "column": 8
+      }
+    },
+    "uid-6": {
+      "start": {
+        "line": 62,
+        "column": 4
+      },
+      "end": {
+        "line": 62,
+        "column": 60
+      }
+    },
+    "uid-7": {
+      "start": {
+        "line": 63,
+        "column": 4
+      },
+      "end": {
+        "line": 63,
+        "column": 57
+      }
+    },
+    "uid-8": {
+      "start": {
+        "line": 64,
+        "column": 4
+      },
+      "end": {
+        "line": 64,
+        "column": 55
+      }
+    },
+    "uid-9": {
+      "start": {
+        "line": 66,
+        "column": 2
+      },
+      "end": {
+        "line": 66,
+        "column": 49
+      }
+    },
+    "uid-10": {
+      "start": {
+        "line": 67,
+        "column": 2
+      },
+      "end": {
+        "line": 70,
+        "column": 8
+      }
+    },
+    "uid-11": {
+      "start": {
+        "line": 68,
+        "column": 4
+      },
+      "end": {
+        "line": 68,
+        "column": 63
+      }
+    },
+    "uid-12": {
+      "start": {
+        "line": 69,
+        "column": 4
+      },
+      "end": {
+        "line": 69,
+        "column": 65
+      }
+    },
+    "uid-13": {
+      "start": {
+        "line": 71,
+        "column": 2
+      },
+      "end": {
+        "line": 71,
+        "column": 58
+      }
+    }
+  }
+}
