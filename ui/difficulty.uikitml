@@ -1,0 +1,142 @@
+<style>
+  .difficulty-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 2;
+    padding-bottom: 2;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(0, 5, 15, 0.92);
+    border-color: #00ddff;
+    border-width: 0.12;
+    border-radius: 1.5;
+    gap: 1;
+  }
+  .header {
+    font-size: 2.5;
+    color: #00ffdd;
+    font-weight: bold;
+  }
+  .sub-header {
+    font-size: 1.2;
+    color: #5588aa;
+  }
+  .diff-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 0.6;
+    padding-bottom: 0.6;
+    padding-left: 2.5;
+    padding-right: 2.5;
+    background-color: rgba(0, 40, 60, 0.6);
+    border-color: #00aacc;
+    border-width: 0.06;
+    border-radius: 0.5;
+    cursor: pointer;
+    min-width: 16;
+  }
+  .diff-btn:hover {
+    background-color: rgba(0, 70, 100, 0.8);
+    border-color: #00ffdd;
+  }
+  .diff-name {
+    font-size: 1.8;
+    color: #00ddff;
+    font-weight: bold;
+  }
+  .diff-desc {
+    font-size: 0.9;
+    color: #5588aa;
+  }
+  .easy-name {
+    font-size: 1.8;
+    color: #00ff88;
+    font-weight: bold;
+  }
+  .medium-name {
+    font-size: 1.8;
+    color: #ffaa00;
+    font-weight: bold;
+  }
+  .hard-name {
+    font-size: 1.8;
+    color: #ff3344;
+    font-weight: bold;
+  }
+  .section-divider {
+    font-size: 1;
+    color: #334455;
+  }
+  .local-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 0.5;
+    padding-bottom: 0.5;
+    padding-left: 2;
+    padding-right: 2;
+    background-color: rgba(40, 30, 0, 0.5);
+    border-color: #886600;
+    border-width: 0.06;
+    border-radius: 0.5;
+    cursor: pointer;
+    min-width: 16;
+  }
+  .local-btn:hover {
+    background-color: rgba(60, 45, 0, 0.7);
+    border-color: #ffaa00;
+  }
+  .local-text {
+    font-size: 1.4;
+    color: #ffaa00;
+    font-weight: bold;
+  }
+  .local-desc {
+    font-size: 0.8;
+    color: #886600;
+  }
+  .back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.5;
+    padding-bottom: 0.5;
+    padding-left: 2;
+    padding-right: 2;
+    background-color: rgba(60, 20, 20, 0.5);
+    border-color: #ff4444;
+    border-width: 0.06;
+    border-radius: 0.4;
+    cursor: pointer;
+  }
+  .back-text {
+    font-size: 1.4;
+    color: #ff6666;
+  }
+</style>
+<div class="difficulty-panel">
+  <span class="header">VS COMPUTER</span>
+  <span id="mode-label" class="sub-header">8-BALL</span>
+  <button id="diff-easy" class="diff-btn" cursor="pointer">
+    <span class="easy-name">EASY</span>
+    <span class="diff-desc">Forgiving aim, slower reactions</span>
+  </button>
+  <button id="diff-medium" class="diff-btn" cursor="pointer">
+    <span class="medium-name">MEDIUM</span>
+    <span class="diff-desc">Balanced opponent, some mistakes</span>
+  </button>
+  <button id="diff-hard" class="diff-btn" cursor="pointer">
+    <span class="hard-name">HARD</span>
+    <span class="diff-desc">Precise aim, expert strategy</span>
+  </button>
+  <span class="section-divider">── OR ──</span>
+  <button id="local-2p" class="local-btn" cursor="pointer">
+    <span class="local-text">2-PLAYER LOCAL</span>
+    <span class="local-desc">Pass and play</span>
+  </button>
+  <button id="back-btn" class="back-btn" cursor="pointer">
+    <span class="back-text">BACK</span>
+  </button>
+</div>

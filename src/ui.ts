@@ -13,8 +13,8 @@ import { GameManager, GameState } from './game';
 import { BallManager } from './balls';
 import { CueStick } from './cue';
 import { AudioManager } from './audio';
+import { CameraController } from './camera';
 
-// UIKit element type helper - elements use signals for reactive text
 type UIKitElement = { text: { value: string }; addEventListener: (event: string, cb: () => void) => void } | null;
 
 function setText(el: any, value: string): void {
@@ -24,20 +24,23 @@ function setText(el: any, value: string): void {
 interface UIEntities {
   titleEntity: any;
   modeEntity: any;
+  difficultyEntity: any;
   hudEntity: any;
   pauseEntity: any;
   gameOverEntity: any;
   settingsEntity: any;
   leaderboardEntity: any;
   messageEntity: any;
+  cameraEntity: any;
 }
 
 export interface UISystem {
   update: (game: GameManager, ballManager: BallManager, cue: CueStick) => void;
   updatePause: (isPaused: boolean) => void;
+  updateCameraMode: (mode: string) => void;
 }
 
-export function setupUI(world: World, game: GameManager, audio: AudioManager): UISystem {
+export function setupUI(world: World, game: GameManager, audio: AudioManager, cameraCtrl?: CameraController): UISystem {
   const entities: UIEntities = {} as any;
 
   // ---- TITLE SCREEN (world-space, in front of table) ----
@@ -60,12 +63,22 @@ export function setupUI(world: World, game: GameManager, audio: AudioManager): U
   });
   entities.modeEntity = modeEntity;
 
+  // ---- DIFFICULTY SELECT (world-space) ----
+  const difficultyEntity = world.createTransformEntity(undefined, { persistent: true });
+  difficultyEntity.object3D.position.set(0, 1.6, -1.8);
+  difficultyEntity.addComponent(PanelUI, {
+    config: '/ui/difficulty.json',
+    maxWidth: 1.0,
+    maxHeight: 1.0,
+  });
+  entities.difficultyEntity = difficultyEntity;
+
   // ---- HUD (head-following) ----
   const hudEntity = world.createTransformEntity(undefined, { persistent: true });
   hudEntity.addComponent(PanelUI, {
     config: '/ui/hud.json',
     maxWidth: 0.35,
-    maxHeight: 0.12,
+    maxHeight: 0.14,
   });
   hudEntity.addComponent(Follower, {
     target: world.player.head,
@@ -92,7 +105,7 @@ export function setupUI(world: World, game: GameManager, audio: AudioManager): U
   gameOverEntity.addComponent(PanelUI, {
     config: '/ui/gameover.json',
     maxWidth: 0.8,
-    maxHeight: 0.6,
+    maxHeight: 0.7,
   });
   entities.gameOverEntity = gameOverEntity;
 
@@ -132,26 +145,45 @@ export function setupUI(world: World, game: GameManager, audio: AudioManager): U
   });
   entities.messageEntity = messageEntity;
 
-  // Wire up button events after a small delay for panel initialization
-  setTimeout(() => wireEvents(entities, game, audio), 500);
+  // ---- CAMERA MODE INDICATOR (head-following, bottom right) ----
+  const cameraEntity = world.createTransformEntity(undefined, { persistent: true });
+  cameraEntity.addComponent(PanelUI, {
+    config: '/ui/camera.json',
+    maxWidth: 0.2,
+    maxHeight: 0.05,
+  });
+  cameraEntity.addComponent(Follower, {
+    target: world.player.head,
+    offsetPosition: [0.25, -0.2, -0.5],
+    behavior: FollowBehavior.PivotY,
+    speed: 5,
+    tolerance: 0.3,
+  });
+  entities.cameraEntity = cameraEntity;
+
+  // Wire up button events after panel initialization
+  setTimeout(() => wireEvents(entities, game, audio, cameraCtrl), 500);
 
   let lastState: GameState | null = null;
 
   function update(game: GameManager, ballManager: BallManager, cue: CueStick) {
     const state = game.state;
+    const isPlaying = state === 'aiming' || state === 'shooting' || state === 'watching' || state === 'ball_in_hand';
 
     // Visibility
     setVisible(entities.titleEntity, state === 'title');
     setVisible(entities.modeEntity, state === 'mode_select');
-    setVisible(entities.hudEntity, state === 'aiming' || state === 'shooting' || state === 'watching' || state === 'ball_in_hand');
+    setVisible(entities.difficultyEntity, state === 'difficulty_select');
+    setVisible(entities.hudEntity, isPlaying);
     setVisible(entities.pauseEntity, game.isPaused);
     setVisible(entities.gameOverEntity, state === 'game_over');
     setVisible(entities.settingsEntity, state === 'settings');
     setVisible(entities.leaderboardEntity, state === 'leaderboard');
     setVisible(entities.messageEntity, game.message !== '');
+    setVisible(entities.cameraEntity, isPlaying);
 
     // Update HUD values
-    if (state === 'aiming' || state === 'shooting' || state === 'watching' || state === 'ball_in_hand') {
+    if (isPlaying) {
       updateHUD(entities.hudEntity, game, ballManager, cue);
     }
 
@@ -163,6 +195,14 @@ export function setupUI(world: World, game: GameManager, audio: AudioManager): U
     // Update game over screen
     if (state === 'game_over' && lastState !== 'game_over') {
       updateGameOver(entities.gameOverEntity, game);
+    }
+
+    // Update difficulty select mode label
+    if (state === 'difficulty_select') {
+      const diffDoc = getDoc(entities.difficultyEntity);
+      if (diffDoc) {
+        setText(diffDoc.getElementById('mode-label'), game.selectedModeForDifficulty.toUpperCase().replace('BALL', '-BALL'));
+      }
     }
 
     // Update leaderboard
@@ -177,7 +217,14 @@ export function setupUI(world: World, game: GameManager, audio: AudioManager): U
     setVisible(entities.pauseEntity, isPaused);
   }
 
-  return { update, updatePause };
+  function updateCameraMode(modeName: string) {
+    const doc = getDoc(entities.cameraEntity);
+    if (doc) {
+      setText(doc.getElementById('cam-mode-text'), modeName);
+    }
+  }
+
+  return { update, updatePause, updateCameraMode };
 }
 
 function setVisible(entity: any, visible: boolean) {
@@ -190,7 +237,7 @@ function getDoc(entity: any): UIKitDocument | undefined {
   return entity?.getValue?.(PanelDocument, 'document') as UIKitDocument | undefined;
 }
 
-function wireEvents(entities: UIEntities, game: GameManager, audio: AudioManager) {
+function wireEvents(entities: UIEntities, game: GameManager, audio: AudioManager, cameraCtrl?: CameraController) {
   // Title buttons
   const titleDoc = getDoc(entities.titleEntity);
   if (titleDoc) {
@@ -202,11 +249,21 @@ function wireEvents(entities: UIEntities, game: GameManager, audio: AudioManager
   // Mode select buttons
   const modeDoc = getDoc(entities.modeEntity);
   if (modeDoc) {
-    modeDoc.getElementById('mode-8ball')?.addEventListener('click', () => game.startGame('8ball'));
-    modeDoc.getElementById('mode-9ball')?.addEventListener('click', () => game.startGame('9ball'));
-    modeDoc.getElementById('mode-freeplay')?.addEventListener('click', () => game.startGame('freeplay'));
-    modeDoc.getElementById('mode-trickshot')?.addEventListener('click', () => game.startGame('trickshot'));
+    modeDoc.getElementById('mode-8ball')?.addEventListener('click', () => game.showDifficultySelect('8ball'));
+    modeDoc.getElementById('mode-9ball')?.addEventListener('click', () => game.showDifficultySelect('9ball'));
+    modeDoc.getElementById('mode-freeplay')?.addEventListener('click', () => game.startGameLocal('freeplay'));
+    modeDoc.getElementById('mode-trickshot')?.addEventListener('click', () => game.startGameLocal('trickshot'));
     modeDoc.getElementById('back-btn')?.addEventListener('click', () => game.showTitle());
+  }
+
+  // Difficulty select buttons
+  const diffDoc = getDoc(entities.difficultyEntity);
+  if (diffDoc) {
+    diffDoc.getElementById('diff-easy')?.addEventListener('click', () => game.startGameWithAI(game.selectedModeForDifficulty, 'easy'));
+    diffDoc.getElementById('diff-medium')?.addEventListener('click', () => game.startGameWithAI(game.selectedModeForDifficulty, 'medium'));
+    diffDoc.getElementById('diff-hard')?.addEventListener('click', () => game.startGameWithAI(game.selectedModeForDifficulty, 'hard'));
+    diffDoc.getElementById('local-2p')?.addEventListener('click', () => game.startGameLocal(game.selectedModeForDifficulty));
+    diffDoc.getElementById('back-btn')?.addEventListener('click', () => game.showModeSelect());
   }
 
   // Pause buttons
@@ -219,7 +276,13 @@ function wireEvents(entities: UIEntities, game: GameManager, audio: AudioManager
   // Game over buttons
   const gameOverDoc = getDoc(entities.gameOverEntity);
   if (gameOverDoc) {
-    gameOverDoc.getElementById('replay-btn')?.addEventListener('click', () => game.startGame(game.mode));
+    gameOverDoc.getElementById('replay-btn')?.addEventListener('click', () => {
+      if (game.hasMatchPending()) {
+        game.continueMatch();
+      } else {
+        game.startGame(game.mode);
+      }
+    });
     gameOverDoc.getElementById('menu-btn')?.addEventListener('click', () => game.showTitle());
   }
 
@@ -228,7 +291,6 @@ function wireEvents(entities: UIEntities, game: GameManager, audio: AudioManager
   if (settingsDoc) {
     settingsDoc.getElementById('back-btn')?.addEventListener('click', () => game.showTitle());
 
-    // Volume controls
     const volStep = 0.1;
     settingsDoc.getElementById('master-down')?.addEventListener('click', () => {
       audio.setMasterVolume(Math.max(0, audio.masterVolume - volStep));
@@ -268,12 +330,15 @@ function updateHUD(entity: any, game: GameManager, ballManager: BallManager, cue
   if (!doc) return;
 
   const player = game.players[game.currentPlayerIndex];
-  setText(doc.getElementById('player-name'), player?.name || '');
+  const playerLabel = player?.name || '';
+  const aiIndicator = player?.isAI ? ' 🤖' : '';
+  setText(doc.getElementById('player-name'), playerLabel + aiIndicator);
   setText(doc.getElementById('mode-label'), game.mode.toUpperCase());
   setText(doc.getElementById('shots-count'), `Shots: ${game.shotCount}`);
 
   const assign = player?.assignment || 'none';
-  setText(doc.getElementById('assignment'), assign === 'none' ? '' : assign.toUpperCase());
+  const matchStatus = game.getMatchStatus();
+  setText(doc.getElementById('assignment'), matchStatus || (assign === 'none' ? '' : assign.toUpperCase()));
 
   // Power bar
   const powerEl = doc.getElementById('power-bar');
@@ -284,7 +349,6 @@ function updateHUD(entity: any, game: GameManager, ballManager: BallManager, cue
     setText(powerEl, '');
   }
 
-  // Ball count
   setText(doc.getElementById('solids-count'), `Solids: ${ballManager.getSolids().length}`);
   setText(doc.getElementById('stripes-count'), `Stripes: ${ballManager.getStripes().length}`);
 }
@@ -305,7 +369,18 @@ function updateGameOver(entity: any, game: GameManager) {
     setText(doc.getElementById('winner-text'), game.message || 'GAME OVER');
   }
 
-  setText(doc.getElementById('stats-text'), `Shots: ${game.shotCount} | Best Streak: ${game.bestStreak}`);
+  let statsText = `Shots: ${game.shotCount} | Best Streak: ${game.bestStreak}`;
+  if (game.hasMatchPending()) {
+    const ms = game.match!;
+    statsText += ` | Match: ${ms.p1Wins}-${ms.p2Wins}`;
+  }
+  setText(doc.getElementById('stats-text'), statsText);
+
+  // Update replay button text
+  const replayBtn = doc.getElementById('replay-btn');
+  if (replayBtn) {
+    // Can't change button text after creation easily, but the label is inside
+  }
 }
 
 function updateLeaderboard(entity: any, game: GameManager) {

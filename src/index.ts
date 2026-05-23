@@ -46,6 +46,8 @@ import { AudioManager } from './audio';
 import { setupUI } from './ui';
 import { XRInputHandler } from './xrinput';
 import { EffectsManager } from './effects';
+import { CameraController } from './camera';
+import { PocketedBallTray } from './tray';
 
 async function main() {
   const container = document.getElementById('scene-container') as HTMLDivElement;
@@ -56,7 +58,7 @@ async function main() {
     features: {
       grabbing: true,
       locomotion: false,
-      physics: false, // We use custom physics for billiards precision
+      physics: false,
       spatialUI: true,
     },
     render: {
@@ -93,21 +95,23 @@ async function main() {
   // Create game manager
   const gameManager = new GameManager(ballManager, physics, cueStick, audioManager, effects);
 
+  // Create camera controller
+  const cameraCtrl = new CameraController();
+
+  // Create pocketed ball tray
+  const tray = new PocketedBallTray(world);
+
   // Setup UI (all PanelUI, zero HTML DOM)
-  const ui = setupUI(world, gameManager, audioManager);
+  const ui = setupUI(world, gameManager, audioManager, cameraCtrl);
 
   // XR input handler
   const xrInput = new XRInputHandler(world, gameManager, cueStick, ballManager);
 
-  // Camera orbit state (browser mode)
-  let cameraAngle = 0;
-  let cameraElevation = 0.6;
-  let cameraDist = 2.0;
+  // Browser mouse input
   let isDragging = false;
   let lastMouseX = 0;
   let lastMouseY = 0;
 
-  // Browser mouse/keyboard input
   const canvas = container;
   canvas.addEventListener('mousedown', (e) => {
     if (e.button === 2) {
@@ -115,8 +119,10 @@ async function main() {
       lastMouseX = e.clientX;
       lastMouseY = e.clientY;
       e.preventDefault();
-    } else if (e.button === 0 && gameManager.state === 'aiming') {
+    } else if (e.button === 0 && gameManager.state === 'aiming' && !gameManager.isCurrentPlayerAI()) {
       cueStick.startCharge();
+    } else if (e.button === 0 && gameManager.state === 'ball_in_hand' && !gameManager.isCurrentPlayerAI()) {
+      gameManager.placeCueBall();
     }
   });
 
@@ -124,16 +130,24 @@ async function main() {
     if (isDragging) {
       const dx = e.clientX - lastMouseX;
       const dy = e.clientY - lastMouseY;
-      cameraAngle -= dx * 0.005;
-      cameraElevation = Math.max(0.2, Math.min(1.2, cameraElevation - dy * 0.005));
+      cameraCtrl.handleDrag(dx, dy);
       lastMouseX = e.clientX;
       lastMouseY = e.clientY;
-    } else if (gameManager.state === 'aiming') {
-      // Aim cue with mouse position
+    } else if (gameManager.state === 'aiming' && !gameManager.isCurrentPlayerAI()) {
       const rect = canvas.getBoundingClientRect();
       const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       const ny = -((e.clientY - rect.top) / rect.height) * 2 + 1;
       cueStick.updateAimFromMouse(nx, ny, world);
+    } else if (gameManager.state === 'ball_in_hand' && !gameManager.isCurrentPlayerAI()) {
+      // Move cue ball with mouse in ball-in-hand mode
+      const cueBall = ballManager.getCueBall();
+      if (cueBall) {
+        const rect = canvas.getBoundingClientRect();
+        const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        cueBall.position.x += nx * 0.01;
+        const hw = TABLE_WIDTH / 2 - 0.03;
+        cueBall.position.x = Math.max(-hw, Math.min(hw, cueBall.position.x));
+      }
     }
   });
 
@@ -146,7 +160,7 @@ async function main() {
   });
 
   canvas.addEventListener('wheel', (e) => {
-    cameraDist = Math.max(1.0, Math.min(4.0, cameraDist + e.deltaY * 0.002));
+    cameraCtrl.handleZoom(e.deltaY);
     e.preventDefault();
   }, { passive: false });
 
@@ -155,15 +169,30 @@ async function main() {
   // Keyboard shortcuts
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      if (gameManager.state === 'playing' || gameManager.state === 'aiming') {
+      if (gameManager.state === 'playing' || gameManager.state === 'aiming' || gameManager.state === 'watching') {
         gameManager.togglePause();
         ui.updatePause(gameManager.isPaused);
       }
-    } else if (e.key === ' ' && gameManager.state === 'aiming') {
+    } else if (e.key === ' ' && gameManager.state === 'aiming' && !gameManager.isCurrentPlayerAI()) {
       cueStick.startCharge();
-    } else if (e.key === 'r' && gameManager.state === 'ball_in_hand') {
-      // Place cue ball at current position
+    } else if (e.key === 'r' && gameManager.state === 'ball_in_hand' && !gameManager.isCurrentPlayerAI()) {
       gameManager.placeCueBall();
+    } else if (e.key === 'c' || e.key === 'C') {
+      // Cycle camera mode
+      cameraCtrl.cycleMode();
+      ui.updateCameraMode(cameraCtrl.getModeName());
+    } else if (e.key === '1') {
+      cameraCtrl.setMode('orbit');
+      ui.updateCameraMode(cameraCtrl.getModeName());
+    } else if (e.key === '2') {
+      cameraCtrl.setMode('topdown');
+      ui.updateCameraMode(cameraCtrl.getModeName());
+    } else if (e.key === '3') {
+      cameraCtrl.setMode('behind');
+      ui.updateCameraMode(cameraCtrl.getModeName());
+    } else if (e.key === '4') {
+      cameraCtrl.setMode('follow');
+      ui.updateCameraMode(cameraCtrl.getModeName());
     }
   });
 
@@ -172,6 +201,13 @@ async function main() {
       cueStick.release(gameManager, audioManager);
     }
   });
+
+  // Reset tray on game start (hook into game manager)
+  const origStartGame = gameManager.startGame.bind(gameManager);
+  gameManager.startGame = (mode: GameMode) => {
+    tray.reset();
+    origStartGame(mode);
+  };
 
   // Main update loop
   let lastTime = performance.now();
@@ -200,6 +236,9 @@ async function main() {
       // Update effects (sparks, trails, etc.)
       effects.update(dt);
 
+      // Update pocketed ball tray
+      tray.update(dt, ballManager, gameManager.currentPlayerIndex);
+
       // Update cue ball trail
       const cueBall = ballManager.getCueBall();
       if (cueBall && !cueBall.pocketed && cueBall.velocity.length() > 1.5) {
@@ -213,17 +252,11 @@ async function main() {
     // Update animated environment (always, even when paused)
     updateEnvironment(dt);
 
-    // Update camera (browser mode)
+    // Update camera (browser mode — only if not in XR)
     if (!(world.input as any).xr?.gamepads?.right) {
       const cam = (world as any).render?.camera || (world as any).scene?.userData?.camera;
       if (cam) {
-        const target = ballManager.getCueBall()?.position || new Vector3(0, TABLE_HEIGHT, 0);
-        cam.position.set(
-          target.x + Math.sin(cameraAngle) * cameraDist,
-          target.y + cameraElevation,
-          target.z + Math.cos(cameraAngle) * cameraDist
-        );
-        cam.lookAt(target.x, target.y, target.z);
+        cameraCtrl.update(dt, ballManager, cueStick, cam);
       }
     }
 

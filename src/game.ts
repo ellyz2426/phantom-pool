@@ -1,30 +1,39 @@
-// Game Manager - game state, scoring, rules (8-ball and 9-ball)
+// Game Manager - game state, scoring, rules (8-ball and 9-ball), AI support, match play
 import { Vector3 } from '@iwsdk/core';
 import { BallManager, CUE_BALL_ID } from './balls';
 import { PhysicsEngine } from './physics';
 import { CueStick } from './cue';
 import { AudioManager } from './audio';
 import { TABLE_HEIGHT, TABLE_LENGTH, TABLE_WIDTH } from './table';
+import { AIOpponent, AIDifficulty } from './ai';
 import type { EffectsManager } from './effects';
 
 export type GameMode = '8ball' | '9ball' | 'freeplay' | 'trickshot';
-export type GameState = 'title' | 'mode_select' | 'playing' | 'aiming' | 'shooting' | 'watching' | 'ball_in_hand' | 'game_over' | 'paused' | 'settings' | 'leaderboard';
+export type GameState = 'title' | 'mode_select' | 'difficulty_select' | 'playing' | 'aiming' | 'shooting' | 'watching' | 'ball_in_hand' | 'game_over' | 'paused' | 'settings' | 'leaderboard';
 export type PlayerAssignment = 'solids' | 'stripes' | 'none';
 
 export interface Player {
   name: string;
   assignment: PlayerAssignment;
-  score: number; // For 9-ball: accumulated ball values
+  score: number;
   ballsPocketed: number[];
   fouls: number;
+  isAI: boolean;
 }
 
 export interface TrickShot {
   name: string;
   description: string;
   setupFn: (bm: BallManager) => void;
-  targetPockets: number[]; // Ball IDs that should be pocketed
+  targetPockets: number[];
   maxShots: number;
+}
+
+export interface MatchState {
+  bestOf: number;
+  p1Wins: number;
+  p2Wins: number;
+  currentGame: number;
 }
 
 export class GameManager {
@@ -45,6 +54,16 @@ export class GameManager {
   shotCount: number = 0;
   message: string = '';
   messageTimer: number = 0;
+
+  // AI
+  ai: AIOpponent;
+  useAI: boolean = false;
+  aiDifficulty: AIDifficulty = 'medium';
+  selectedModeForDifficulty: GameMode = '8ball';
+
+  // Match play
+  match: MatchState | null = null;
+  matchEnabled: boolean = false;
 
   // Trick shot state
   trickShots: TrickShot[] = [];
@@ -67,6 +86,7 @@ export class GameManager {
     this.cueStick = cueStick;
     this.audio = audio;
     this.effects = effects;
+    this.ai = new AIOpponent('medium');
 
     this.loadStats();
     this.initTrickShots();
@@ -75,10 +95,29 @@ export class GameManager {
   showTitle(): void {
     this.state = 'title';
     this.cueStick.hide();
+    this.match = null;
+    this.matchEnabled = false;
   }
 
   showModeSelect(): void {
     this.state = 'mode_select';
+  }
+
+  showDifficultySelect(mode: GameMode): void {
+    this.selectedModeForDifficulty = mode;
+    this.state = 'difficulty_select';
+  }
+
+  startGameWithAI(mode: GameMode, difficulty: AIDifficulty): void {
+    this.useAI = true;
+    this.aiDifficulty = difficulty;
+    this.ai.setDifficultyParams(difficulty);
+    this.startGame(mode);
+  }
+
+  startGameLocal(mode: GameMode): void {
+    this.useAI = false;
+    this.startGame(mode);
   }
 
   startGame(mode: GameMode): void {
@@ -90,11 +129,20 @@ export class GameManager {
     this.currentStreak = 0;
 
     // Initialize players
+    const p2Name = this.useAI
+      ? `CPU (${this.aiDifficulty.charAt(0).toUpperCase() + this.aiDifficulty.slice(1)})`
+      : mode === 'freeplay' ? 'Free Play' : 'Player 2';
+
     this.players = [
-      { name: 'Player 1', assignment: 'none', score: 0, ballsPocketed: [], fouls: 0 },
-      { name: mode === 'freeplay' ? 'Free Play' : 'Player 2', assignment: 'none', score: 0, ballsPocketed: [], fouls: 0 },
+      { name: 'Player 1', assignment: 'none', score: 0, ballsPocketed: [], fouls: 0, isAI: false },
+      { name: p2Name, assignment: 'none', score: 0, ballsPocketed: [], fouls: 0, isAI: this.useAI },
     ];
     this.currentPlayerIndex = 0;
+
+    // Initialize match if enabled
+    if (this.matchEnabled && !this.match) {
+      this.match = { bestOf: 3, p1Wins: 0, p2Wins: 0, currentGame: 1 };
+    }
 
     // Create and rack balls
     this.ballManager.createBalls();
@@ -109,10 +157,15 @@ export class GameManager {
 
     // Show cue
     this.cueStick.show();
-    this.cueStick.setAimAngle(Math.PI); // Aim toward rack
+    this.cueStick.setAimAngle(Math.PI);
 
     this.audio.playGameStart();
     this.showMessage('BREAK!', 2.0);
+  }
+
+  isCurrentPlayerAI(): boolean {
+    const player = this.players[this.currentPlayerIndex];
+    return player?.isAI ?? false;
   }
 
   onShot(): void {
@@ -120,7 +173,6 @@ export class GameManager {
     this.shotCount++;
     this.physics.resetShotTracking();
 
-    // Brief delay before transitioning to watching
     setTimeout(() => {
       if (this.state === 'shooting') {
         this.state = 'watching';
@@ -141,6 +193,7 @@ export class GameManager {
       } else {
         this.state = 'aiming';
         this.cueStick.show();
+        this.checkAndStartAI();
       }
       return;
     }
@@ -161,12 +214,10 @@ export class GameManager {
       foul = true;
       this.showMessage('NO CONTACT', 2.0);
     } else if (this.mode === '8ball' && this.assignmentsDone) {
-      // Must hit own group first
       const targetGroup = currentPlayer.assignment === 'solids'
         ? [1, 2, 3, 4, 5, 6, 7]
         : [9, 10, 11, 12, 13, 14, 15];
 
-      // If all own balls pocketed, must hit 8 first
       const ownBalls = this.ballManager.balls.filter(
         b => targetGroup.includes(b.id) && !b.pocketed
       );
@@ -180,7 +231,6 @@ export class GameManager {
         this.showMessage('WRONG BALL', 2.0);
       }
     } else if (this.mode === '9ball') {
-      // Must hit lowest numbered ball first
       const lowestActive = this.ballManager.getActiveBalls()
         .filter(b => b.id !== CUE_BALL_ID)
         .sort((a, b) => a.id - b.id)[0];
@@ -198,6 +248,7 @@ export class GameManager {
         this.switchPlayer();
         this.state = 'aiming';
         this.cueStick.show();
+        this.checkAndStartAI();
       }
       return;
     }
@@ -206,7 +257,6 @@ export class GameManager {
     const objectBallsPocketed = pocketed.filter(id => id !== CUE_BALL_ID);
 
     if (this.mode === '8ball') {
-      // Handle assignment on first pocket after break
       if (!this.assignmentsDone && objectBallsPocketed.length > 0) {
         const first = objectBallsPocketed[0];
         if (first >= 1 && first <= 7) {
@@ -222,9 +272,7 @@ export class GameManager {
         }
       }
 
-      // Check 8-ball pocketed
       if (objectBallsPocketed.includes(8)) {
-        // Check if player was supposed to pocket 8
         if (this.assignmentsDone) {
           const targetGroup = currentPlayer.assignment === 'solids'
             ? [1, 2, 3, 4, 5, 6, 7]
@@ -233,28 +281,24 @@ export class GameManager {
             b => targetGroup.includes(b.id) && !b.pocketed
           );
           if (ownRemaining.length === 0) {
-            // Win!
             this.showMessage(`${currentPlayer.name} WINS!`, 3.0);
             this.audio.playWin();
             this.endGame(this.currentPlayerIndex);
             return;
           }
         }
-        // Early 8-ball pocket = loss
         this.showMessage(`${currentPlayer.name} LOSES (early 8-ball)`, 3.0);
         this.audio.playLose();
         this.endGame(1 - this.currentPlayerIndex);
         return;
       }
 
-      // Track pocketed balls
       for (const id of objectBallsPocketed) {
         currentPlayer.ballsPocketed.push(id);
       }
     }
 
     if (this.mode === '9ball') {
-      // Pocket 9-ball to win (if legal)
       if (objectBallsPocketed.includes(9)) {
         this.showMessage(`${currentPlayer.name} WINS!`, 3.0);
         this.audio.playWin();
@@ -267,9 +311,7 @@ export class GameManager {
       }
     }
 
-    // Continue or switch player
     if (objectBallsPocketed.length > 0 && !foul) {
-      // Player continues
       this.currentStreak++;
       this.bestStreak = Math.max(this.bestStreak, this.currentStreak);
       this.showMessage('NICE SHOT!', 1.0);
@@ -281,11 +323,11 @@ export class GameManager {
     this.state = 'aiming';
     this.cueStick.show();
     this.cueStick.setAimAngle(this.cueStick.aimAngle);
+    this.checkAndStartAI();
   }
 
   handleBallInHand(): void {
     this.state = 'ball_in_hand';
-    // Restore cue ball to center of head area
     const cueBall = this.ballManager.getCueBall();
     if (cueBall) {
       cueBall.pocketed = false;
@@ -293,7 +335,19 @@ export class GameManager {
       cueBall.velocity.set(0, 0, 0);
     }
     this.switchPlayer();
-    this.showMessage('BALL IN HAND - Click to place', 3.0);
+
+    if (this.isCurrentPlayerAI()) {
+      this.showMessage('CPU PLACING BALL...', 2.0);
+      // AI places cue ball after a brief delay
+      setTimeout(() => {
+        if (this.state === 'ball_in_hand' && this.isCurrentPlayerAI()) {
+          this.ai.placeCueBall(this);
+          this.placeCueBall();
+        }
+      }, 1500);
+    } else {
+      this.showMessage('BALL IN HAND - Click to place', 3.0);
+    }
   }
 
   placeCueBall(): void {
@@ -301,6 +355,15 @@ export class GameManager {
     this.state = 'aiming';
     this.cueStick.show();
     this.showMessage('YOUR SHOT', 1.0);
+    this.checkAndStartAI();
+  }
+
+  // Check if it's AI's turn and start thinking
+  checkAndStartAI(): void {
+    if (this.isCurrentPlayerAI() && this.state === 'aiming') {
+      this.showMessage(`${this.players[this.currentPlayerIndex].name} thinking...`, 5.0);
+      this.ai.startThinking(this);
+    }
   }
 
   switchPlayer(): void {
@@ -325,6 +388,11 @@ export class GameManager {
         this.message = '';
       }
     }
+
+    // Update AI if it's AI's turn
+    if (this.isCurrentPlayerAI() && !this.isPaused) {
+      this.ai.update(dt, this, this.cueStick, this.audio);
+    }
   }
 
   endGame(winnerIndex: number): void {
@@ -332,7 +400,23 @@ export class GameManager {
     this.totalGames++;
     this.cueStick.hide();
 
-    // Save to leaderboard
+    // Update match state
+    if (this.match) {
+      if (winnerIndex === 0) this.match.p1Wins++;
+      else this.match.p2Wins++;
+
+      const neededWins = Math.ceil(this.match.bestOf / 2);
+      if (this.match.p1Wins >= neededWins || this.match.p2Wins >= neededWins) {
+        // Match over
+        const matchWinner = this.match.p1Wins >= neededWins ? this.players[0].name : this.players[1].name;
+        this.showMessage(`${matchWinner} WINS THE MATCH! (${this.match.p1Wins}-${this.match.p2Wins})`, 4.0);
+        this.match = null;
+      } else {
+        this.match.currentGame++;
+        this.showMessage(`Game ${this.match.currentGame - 1} complete! (${this.match.p1Wins}-${this.match.p2Wins})`, 3.0);
+      }
+    }
+
     const entry = {
       name: this.players[winnerIndex].name,
       mode: this.mode,
@@ -345,6 +429,21 @@ export class GameManager {
     this.saveStats();
   }
 
+  // Continue match (next game in series)
+  continueMatch(): void {
+    if (!this.match) return;
+    this.startGame(this.mode);
+  }
+
+  hasMatchPending(): boolean {
+    return this.match !== null;
+  }
+
+  getMatchStatus(): string {
+    if (!this.match) return '';
+    return `Game ${this.match.currentGame} of ${this.match.bestOf} | ${this.match.p1Wins}-${this.match.p2Wins}`;
+  }
+
   private initTrickShots(): void {
     const HL = TABLE_LENGTH / 2;
     const HW = TABLE_WIDTH / 2;
@@ -355,7 +454,6 @@ export class GameManager {
         description: 'Pocket the 1-ball in the corner',
         setupFn: (bm) => {
           bm.createBalls();
-          // Only cue ball and 1-ball
           for (const b of bm.balls) {
             if (b.id !== 0 && b.id !== 1) b.pocketed = true;
           }
@@ -421,6 +519,88 @@ export class GameManager {
         targetPockets: [1, 2, 3],
         maxShots: 3,
       },
+      // --- NEW TRICK SHOTS ---
+      {
+        name: 'Double Kiss',
+        description: 'Pocket two balls with one shot',
+        setupFn: (bm) => {
+          bm.createBalls();
+          for (const b of bm.balls) {
+            if (b.id !== 0 && b.id !== 1 && b.id !== 2) b.pocketed = true;
+          }
+          // 1-ball near top-left pocket, 2-ball near top-right pocket
+          const b1 = bm.getBall(1)!;
+          b1.position.set(-HW * 0.5, TABLE_HEIGHT + 0.028, -HL * 0.7);
+          const b2 = bm.getBall(2)!;
+          b2.position.set(HW * 0.5, TABLE_HEIGHT + 0.028, -HL * 0.7);
+          const cue = bm.getCueBall()!;
+          cue.position.set(0, TABLE_HEIGHT + 0.028, -HL * 0.3);
+        },
+        targetPockets: [1, 2],
+        maxShots: 1,
+      },
+      {
+        name: 'Long Rail',
+        description: 'Bank off the long rail to pocket the 4-ball',
+        setupFn: (bm) => {
+          bm.createBalls();
+          for (const b of bm.balls) {
+            if (b.id !== 0 && b.id !== 4) b.pocketed = true;
+          }
+          const b4 = bm.getBall(4)!;
+          b4.position.set(HW * 0.6, TABLE_HEIGHT + 0.028, 0);
+          const cue = bm.getCueBall()!;
+          cue.position.set(-HW * 0.4, TABLE_HEIGHT + 0.028, HL * 0.6);
+        },
+        targetPockets: [4],
+        maxShots: 2,
+      },
+      {
+        name: 'Cluster Break',
+        description: 'Break the cluster and pocket any 2 balls',
+        setupFn: (bm) => {
+          bm.createBalls();
+          for (const b of bm.balls) {
+            if (b.id > 5) b.pocketed = true;
+          }
+          // Tight cluster of balls 1-5
+          const positions = [
+            [0, -HL * 0.2],
+            [-0.03, -HL * 0.25],
+            [0.03, -HL * 0.25],
+            [-0.015, -HL * 0.15],
+            [0.015, -HL * 0.15],
+          ];
+          for (let i = 1; i <= 5; i++) {
+            const b = bm.getBall(i)!;
+            const [x, z] = positions[i - 1];
+            b.position.set(x, TABLE_HEIGHT + 0.028, z);
+          }
+          const cue = bm.getCueBall()!;
+          cue.position.set(0, TABLE_HEIGHT + 0.028, HL * 0.5);
+        },
+        targetPockets: [1, 2, 3, 4, 5], // Any 2 of these
+        maxShots: 2,
+      },
+      {
+        name: 'Corner Pocket Sniper',
+        description: 'Pocket balls in all 4 corner pockets',
+        setupFn: (bm) => {
+          bm.createBalls();
+          for (const b of bm.balls) {
+            if (b.id > 4) b.pocketed = true;
+          }
+          // One ball near each corner
+          bm.getBall(1)!.position.set(-HW * 0.4, TABLE_HEIGHT + 0.028, -HL * 0.6);
+          bm.getBall(2)!.position.set(HW * 0.4, TABLE_HEIGHT + 0.028, -HL * 0.6);
+          bm.getBall(3)!.position.set(-HW * 0.4, TABLE_HEIGHT + 0.028, HL * 0.6);
+          bm.getBall(4)!.position.set(HW * 0.4, TABLE_HEIGHT + 0.028, HL * 0.6);
+          const cue = bm.getCueBall()!;
+          cue.position.set(0, TABLE_HEIGHT + 0.028, 0);
+        },
+        targetPockets: [1, 2, 3, 4],
+        maxShots: 4,
+      },
     ];
   }
 
@@ -441,12 +621,18 @@ export class GameManager {
     const trick = this.trickShots[this.currentTrickIndex];
     this.trickShotsRemaining--;
 
-    const targetPocketed = pocketed.filter(id => trick.targetPockets.includes(id));
     const allPocketed = trick.targetPockets.every(
       id => this.ballManager.getBall(id)?.pocketed
     );
 
-    if (allPocketed) {
+    // For "pocket any 2" type tricks (Cluster Break)
+    const pocketedCount = trick.targetPockets.filter(
+      id => this.ballManager.getBall(id)?.pocketed
+    ).length;
+    const isClusterTrick = trick.name === 'Cluster Break';
+    const clusterComplete = isClusterTrick && pocketedCount >= 2;
+
+    if (allPocketed || clusterComplete) {
       this.showMessage('TRICK COMPLETE!', 2.0);
       this.audio.playPocket();
       this.currentTrickIndex++;

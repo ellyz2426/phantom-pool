@@ -1,0 +1,33 @@
+<style>
+  .camera-panel {
+    display: flex;
+    flex-direction: row;
+    padding-top: 0.4;
+    padding-bottom: 0.4;
+    padding-left: 1;
+    padding-right: 1;
+    background-color: rgba(0, 5, 15, 0.6);
+    border-color: #335566;
+    border-width: 0.04;
+    border-radius: 0.3;
+    gap: 0.8;
+  }
+  .cam-label {
+    font-size: 0.9;
+    color: #5588aa;
+  }
+  .cam-mode {
+    font-size: 0.9;
+    color: #00ddff;
+    font-weight: bold;
+  }
+  .cam-hint {
+    font-size: 0.7;
+    color: #334455;
+  }
+</style>
+<div class="camera-panel">
+  <span class="cam-label">CAM:</span>
+  <span id="cam-mode-text" class="cam-mode">FREE ORBIT</span>
+  <span class="cam-hint">[C]</span>
+</div>
