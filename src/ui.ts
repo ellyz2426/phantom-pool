@@ -576,6 +576,8 @@ function wireEvents(entities: UIEntities, game: GameManager, audio: AudioManager
     themeDoc.getElementById('theme-pink')?.addEventListener('click', () => themeManager.setTheme('pink'));
     themeDoc.getElementById('theme-gold')?.addEventListener('click', () => themeManager.setTheme('gold'));
     themeDoc.getElementById('theme-purple')?.addEventListener('click', () => themeManager.setTheme('purple'));
+    themeDoc.getElementById('theme-blood')?.addEventListener('click', () => themeManager.setTheme('blood'));
+    themeDoc.getElementById('theme-frost')?.addEventListener('click', () => themeManager.setTheme('frost'));
     themeDoc.getElementById('back-btn')?.addEventListener('click', () => game.showTitle());
   }
 

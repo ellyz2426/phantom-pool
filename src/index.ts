@@ -388,7 +388,7 @@ function applyTheme(world: World, theme: ThemeColors): void {
       if (name === 'pool-table' || (obj.parent?.name === 'pool-table')) {
         // Only update specific parts based on current color
         const hex = obj.material.color.getHex();
-        if (hex === 0x004d33 || hex === 0x2a0028 || hex === 0x1a3300 || hex === 0x0d0033) {
+        if (hex === 0x004d33 || hex === 0x2a0028 || hex === 0x1a3300 || hex === 0x0d0033 || hex === 0x1a0808 || hex === 0x0a1a2a || hex === theme.feltColor) {
           // Felt surface
           obj.material.color.setHex(theme.feltColor);
           obj.material.emissive.setHex(theme.feltEmissive);
@@ -402,15 +402,18 @@ function applyTheme(world: World, theme: ThemeColors): void {
   scene.traverse((obj: any) => {
     if (obj.isPointLight) {
       const hex = obj.color.getHex();
-      // Primary table light
-      if (hex === 0x00ddff || hex === 0xff44cc || hex === 0xffdd88 || hex === 0xaa66ff) {
+      // Primary table light — match any known primary light color
+      if (hex === 0x00ddff || hex === 0xff44cc || hex === 0xffdd88 || hex === 0xaa66ff ||
+          hex === 0xff3322 || hex === 0x88ddff || hex === theme.primaryLight) {
         obj.color.setHex(theme.primaryLight);
       }
       // Secondary lights
-      if (hex === 0x00ff88 || hex === 0xff8800 || hex === 0xffaa44 || hex === 0x00ccff) {
+      if (hex === 0x00ff88 || hex === 0xff8800 || hex === 0xffaa44 || hex === 0x00ccff ||
+          hex === 0xff6600 || hex === 0xaaeeff || hex === theme.secondaryLight) {
         obj.color.setHex(theme.secondaryLight);
       }
-      if (hex === 0x8800ff || hex === 0x4400ff || hex === 0x886622 || hex === 0xff44aa) {
+      if (hex === 0x8800ff || hex === 0x4400ff || hex === 0x886622 || hex === 0xff44aa ||
+          hex === 0x880022 || hex === 0x4488cc || hex === theme.tertiaryLight) {
         obj.color.setHex(theme.tertiaryLight);
       }
     }

@@ -1,4 +1,5 @@
-// Visual Effects - collision sparks, pocket animations, ball trails
+// Visual Effects - collision sparks, pocket animations, ball trails, rail sparkles
+// Uses object pooling for performance
 import {
   World,
   Mesh,
@@ -10,6 +11,11 @@ import {
   Vector3,
   AdditiveBlending,
 } from '@iwsdk/core';
+
+// Shared geometries (pooled)
+const SPARK_GEO = new SphereGeometry(0.004, 4, 4);
+const TRAIL_GEO = new SphereGeometry(0.006, 4, 4);
+const CONE_GEO = new ConeGeometry(0.005, 0.012, 4);
 
 interface Particle {
   mesh: Mesh;
@@ -29,6 +35,9 @@ export class EffectsManager {
   trails: TrailPoint[] = [];
   pocketFlashes: { mesh: Mesh; life: number }[] = [];
   effectsGroup: Group;
+  private particlePool: Mesh[] = [];
+  private readonly MAX_PARTICLES = 80;
+  private readonly MAX_TRAILS = 30;
 
   constructor(world: World) {
     this.world = world;
@@ -37,21 +46,47 @@ export class EffectsManager {
     world.scene.add(this.effectsGroup);
   }
 
-  // Spawn collision sparks between two balls
-  spawnCollisionSparks(position: Vector3, impactSpeed: number): void {
-    const count = Math.min(Math.floor(impactSpeed * 4) + 2, 12);
-    const intensity = Math.min(impactSpeed / 3.0, 1.0);
-
-    for (let i = 0; i < count; i++) {
-      const geo = new SphereGeometry(0.003 + Math.random() * 0.003, 4, 4);
-      const hue = Math.random() > 0.5 ? 0x00ffdd : 0x00aaff;
+  // Get a mesh from pool or create new
+  private getPooledMesh(geo: SphereGeometry | ConeGeometry, color: number, opacity: number): Mesh {
+    let mesh = this.particlePool.pop();
+    if (mesh) {
+      (mesh.material as MeshBasicMaterial).color.setHex(color);
+      (mesh.material as MeshBasicMaterial).opacity = opacity;
+      mesh.visible = true;
+      mesh.scale.setScalar(1);
+      mesh.geometry = geo;
+    } else {
       const mat = new MeshBasicMaterial({
-        color: hue,
+        color,
         transparent: true,
-        opacity: 0.8 * intensity,
+        opacity,
         blending: AdditiveBlending,
       });
-      const mesh = new Mesh(geo, mat);
+      mesh = new Mesh(geo, mat);
+    }
+    return mesh;
+  }
+
+  // Return mesh to pool
+  private recycleMesh(mesh: Mesh): void {
+    mesh.visible = false;
+    if (this.particlePool.length < 50) {
+      this.particlePool.push(mesh);
+    } else {
+      mesh.geometry.dispose();
+      (mesh.material as MeshBasicMaterial).dispose();
+    }
+  }
+
+  // Spawn collision sparks between two balls
+  spawnCollisionSparks(position: Vector3, impactSpeed: number): void {
+    if (this.particles.length >= this.MAX_PARTICLES) return;
+    const count = Math.min(Math.floor(impactSpeed * 4) + 2, 10);
+    const intensity = Math.min(impactSpeed / 3.0, 1.0);
+
+    for (let i = 0; i < count && this.particles.length < this.MAX_PARTICLES; i++) {
+      const hue = Math.random() > 0.5 ? 0x00ffdd : 0x00aaff;
+      const mesh = this.getPooledMesh(SPARK_GEO, hue, 0.8 * intensity);
       mesh.position.copy(position);
       this.effectsGroup.add(mesh);
 
@@ -75,29 +110,22 @@ export class EffectsManager {
   // Flash at pocket when ball is pocketed
   spawnPocketFlash(position: Vector3): void {
     // Ring flash
-    const geo = new SphereGeometry(0.06, 12, 12);
+    const flashGeo = new SphereGeometry(0.06, 12, 12);
     const mat = new MeshBasicMaterial({
       color: 0xff8800,
       transparent: true,
       opacity: 0.9,
       blending: AdditiveBlending,
     });
-    const mesh = new Mesh(geo, mat);
+    const mesh = new Mesh(flashGeo, mat);
     mesh.position.copy(position);
     mesh.position.y += 0.01;
     this.effectsGroup.add(mesh);
     this.pocketFlashes.push({ mesh, life: 0.5 });
 
     // Spawn upward sparks
-    for (let i = 0; i < 8; i++) {
-      const sparkGeo = new SphereGeometry(0.004, 4, 4);
-      const sparkMat = new MeshBasicMaterial({
-        color: 0xffaa00,
-        transparent: true,
-        opacity: 0.9,
-        blending: AdditiveBlending,
-      });
-      const sparkMesh = new Mesh(sparkGeo, sparkMat);
+    for (let i = 0; i < 8 && this.particles.length < this.MAX_PARTICLES; i++) {
+      const sparkMesh = this.getPooledMesh(SPARK_GEO, 0xffaa00, 0.9);
       sparkMesh.position.copy(position);
       this.effectsGroup.add(sparkMesh);
 
@@ -117,14 +145,14 @@ export class EffectsManager {
 
   // Add trail point behind fast-moving ball
   spawnTrailPoint(position: Vector3, color: number): void {
-    const geo = new SphereGeometry(0.006, 4, 4);
+    if (this.trails.length >= this.MAX_TRAILS) return;
     const mat = new MeshBasicMaterial({
       color,
       transparent: true,
       opacity: 0.3,
       blending: AdditiveBlending,
     });
-    const mesh = new Mesh(geo, mat);
+    const mesh = new Mesh(TRAIL_GEO, mat);
     mesh.position.copy(position);
     this.effectsGroup.add(mesh);
     this.trails.push({ mesh, life: 0.2 });
@@ -132,20 +160,13 @@ export class EffectsManager {
 
   // Chalk dust puff when cue strikes ball
   spawnChalkDust(position: Vector3, direction: Vector3, power: number): void {
-    const count = Math.min(Math.floor(power * 3) + 4, 20);
+    if (this.particles.length >= this.MAX_PARTICLES) return;
+    const count = Math.min(Math.floor(power * 3) + 4, 16);
     const intensity = Math.min(power / 6.0, 1.0);
 
-    for (let i = 0; i < count; i++) {
-      const geo = new SphereGeometry(0.002 + Math.random() * 0.004, 4, 4);
-      // Blue-white chalk dust
+    for (let i = 0; i < count && this.particles.length < this.MAX_PARTICLES; i++) {
       const hue = Math.random() > 0.3 ? 0x88ccff : 0xaaddff;
-      const mat = new MeshBasicMaterial({
-        color: hue,
-        transparent: true,
-        opacity: 0.5 * intensity,
-        blending: AdditiveBlending,
-      });
-      const mesh = new Mesh(geo, mat);
+      const mesh = this.getPooledMesh(SPARK_GEO, hue, 0.5 * intensity);
       mesh.position.copy(position);
       this.effectsGroup.add(mesh);
 
@@ -182,21 +203,14 @@ export class EffectsManager {
 
   // Rail sparkle/diamond effect when ball bounces off cushion
   spawnRailSparkle(position: Vector3, speed: number): void {
-    const count = Math.min(Math.floor(speed * 3) + 3, 10);
+    if (this.particles.length >= this.MAX_PARTICLES) return;
+    const count = Math.min(Math.floor(speed * 3) + 3, 8);
     const intensity = Math.min(speed / 2.5, 1.0);
 
-    for (let i = 0; i < count; i++) {
-      // Diamond-shaped sparkles along the rail
-      const geo = new ConeGeometry(0.004 + Math.random() * 0.003, 0.012, 4);
+    for (let i = 0; i < count && this.particles.length < this.MAX_PARTICLES; i++) {
       const colors = [0x00ffdd, 0xffcc00, 0x00aaff, 0xff8800];
       const hue = colors[Math.floor(Math.random() * colors.length)];
-      const mat = new MeshBasicMaterial({
-        color: hue,
-        transparent: true,
-        opacity: 0.9 * intensity,
-        blending: AdditiveBlending,
-      });
-      const mesh = new Mesh(geo, mat);
+      const mesh = this.getPooledMesh(CONE_GEO, hue, 0.9 * intensity);
       mesh.position.copy(position);
       mesh.position.y += 0.01;
       mesh.rotation.z = Math.random() * Math.PI;
@@ -231,8 +245,7 @@ export class EffectsManager {
       p.life -= dt;
       if (p.life <= 0) {
         this.effectsGroup.remove(p.mesh);
-        p.mesh.geometry.dispose();
-        (p.mesh.material as MeshBasicMaterial).dispose();
+        this.recycleMesh(p.mesh);
         this.particles.splice(i, 1);
         continue;
       }
@@ -277,9 +290,9 @@ export class EffectsManager {
         continue;
       }
 
-      const ratio = t.life / 0.2;
-      (t.mesh.material as MeshBasicMaterial).opacity = ratio * 0.3;
-      t.mesh.scale.setScalar(ratio);
+      const trailRatio = t.life / 0.2;
+      (t.mesh.material as MeshBasicMaterial).opacity = trailRatio * 0.3;
+      t.mesh.scale.setScalar(trailRatio);
     }
   }
 }

@@ -96,5 +96,15 @@
       <span class="theme-name">PURPLE HAZE</span>
     </div>
   </div>
+  <div class="theme-row">
+    <div id="theme-blood" class="theme-btn" cursor="pointer">
+      <span class="theme-preview" style="color: #ff3322;">◆</span>
+      <span class="theme-name">BLOOD MOON</span>
+    </div>
+    <div id="theme-frost" class="theme-btn" cursor="pointer">
+      <span class="theme-preview" style="color: #88ddff;">◆</span>
+      <span class="theme-name">ARCTIC FROST</span>
+    </div>
+  </div>
   <div id="back-btn" class="back-btn" cursor="pointer">← BACK</div>
 </div>
