@@ -248,7 +248,11 @@ export class GameManager {
       this.audio.playScratch();
     } else if (firstHit === -1 && pocketed.length === 0) {
       foul = true;
-      this.showMessage('NO CONTACT', 2.0);
+      if (this.isBreakShot) {
+        this.showMessage('WEAK BREAK - NO CONTACT', 2.5);
+      } else {
+        this.showMessage('NO CONTACT', 2.0);
+      }
     } else if (this.mode === '8ball' && this.assignmentsDone) {
       const targetGroup = currentPlayer.assignment === 'solids'
         ? [1, 2, 3, 4, 5, 6, 7]
@@ -351,7 +355,21 @@ export class GameManager {
     if (objectBallsPocketed.length > 0 && !foul) {
       this.currentStreak++;
       this.bestStreak = Math.max(this.bestStreak, this.currentStreak);
-      this.showMessage('NICE SHOT!', 1.0);
+
+      // Rate the shot quality
+      if (objectBallsPocketed.length >= 3) {
+        this.showMessage('🔥 INCREDIBLE! ' + objectBallsPocketed.length + ' BALLS!', 2.0);
+      } else if (objectBallsPocketed.length >= 2) {
+        this.showMessage('👑 COMBO! ' + objectBallsPocketed.length + ' BALLS!', 1.5);
+      } else if (this.currentStreak >= 5) {
+        this.showMessage('🔥🔥 ON FIRE!', 1.0);
+      } else if (this.currentStreak >= 3) {
+        this.showMessage('🔥 HOT HAND!', 1.0);
+      } else if (this.isBreakShot) {
+        this.showMessage('GREAT BREAK!', 1.5);
+      } else {
+        this.showMessage('NICE SHOT!', 1.0);
+      }
 
       // Achievement checks for pocketing
       this.achievements.checkAchievements({

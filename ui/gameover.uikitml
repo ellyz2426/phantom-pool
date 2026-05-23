@@ -11,7 +11,7 @@
     border-color: #00ffcc;
     border-width: 0.15;
     border-radius: 1.5;
-    gap: 1.5;
+    gap: 1;
   }
   .go-title {
     font-size: 3;
@@ -25,6 +25,10 @@
   .stats-text {
     font-size: 1.2;
     color: #88aacc;
+  }
+  .detail-text {
+    font-size: 1;
+    color: #668899;
   }
   .go-btn {
     display: flex;
@@ -54,6 +58,7 @@
   <span class="go-title">GAME OVER</span>
   <span id="winner-text" class="winner-text">Player 1 Wins!</span>
   <span id="stats-text" class="stats-text">Shots: 0 | Best Streak: 0</span>
+  <span id="detail-text" class="detail-text"></span>
   <button id="replay-btn" class="go-btn" cursor="pointer">
     <span class="btn-text">PLAY AGAIN</span>
   </button>

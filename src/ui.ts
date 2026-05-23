@@ -459,11 +459,25 @@ function updateHUD(entity: any, game: GameManager, ballManager: BallManager, cue
   const matchStatus = game.getMatchStatus();
   setText(doc.getElementById('assignment'), matchStatus || (assign === 'none' ? '' : assign.toUpperCase()));
 
+  // Show current streak
+  const streakEl = doc.getElementById('streak-label');
+  if (streakEl) {
+    if (game.currentStreak >= 3) {
+      setText(streakEl, `🔥 x${game.currentStreak}`);
+    } else if (game.currentStreak >= 2) {
+      setText(streakEl, `x${game.currentStreak}`);
+    } else {
+      setText(streakEl, '');
+    }
+  }
+
   // Power bar
   const powerEl = doc.getElementById('power-bar');
   if (powerEl && cue.isCharging) {
     const ratio = cue.power / 8.0;
-    setText(powerEl, '█'.repeat(Math.floor(ratio * 15)));
+    const filled = Math.floor(ratio * 15);
+    const bar = '█'.repeat(filled) + '░'.repeat(15 - filled);
+    setText(powerEl, bar);
   } else if (powerEl) {
     setText(powerEl, '');
   }
@@ -494,6 +508,19 @@ function updateGameOver(entity: any, game: GameManager) {
     statsText += ` | Match: ${ms.p1Wins}-${ms.p2Wins}`;
   }
   setText(doc.getElementById('stats-text'), statsText);
+
+  // Additional detail line
+  const p1 = game.players[0];
+  const p2 = game.players[1];
+  let detailText = '';
+  if (p1 && p2 && game.mode !== 'freeplay' && game.mode !== 'trickshot') {
+    const p1Pocketed = p1.ballsPocketed.length;
+    const p2Pocketed = p2.ballsPocketed.length;
+    const p1Fouls = p1.fouls;
+    const p2Fouls = p2.fouls;
+    detailText = `${p1.name}: ${p1Pocketed} pocketed, ${p1Fouls} fouls | ${p2.name}: ${p2Pocketed} pocketed, ${p2Fouls} fouls`;
+  }
+  setText(doc.getElementById('detail-text'), detailText);
 }
 
 function updateLeaderboard(entity: any, game: GameManager) {

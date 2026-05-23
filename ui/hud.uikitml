@@ -16,6 +16,7 @@
     display: flex;
     flex-direction: row;
     gap: 1.5;
+    align-items: center;
   }
   .player-text {
     font-size: 1.4;
@@ -29,6 +30,11 @@
   .stat-text {
     font-size: 1;
     color: #88aacc;
+  }
+  .streak-text {
+    font-size: 1;
+    color: #ff6600;
+    font-weight: bold;
   }
   .assignment-text {
     font-size: 1;
@@ -52,6 +58,7 @@
   <div class="hud-row">
     <span id="shots-count" class="stat-text">Shots: 0</span>
     <span id="assignment" class="assignment-text"></span>
+    <span id="streak-label" class="streak-text"></span>
   </div>
   <span id="power-bar" class="power-text"></span>
   <div class="hud-row">

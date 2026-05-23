@@ -16,6 +16,8 @@ import {
   Vector3,
   AdditiveBlending,
   RingGeometry,
+  BufferGeometry,
+  Float32BufferAttribute,
 } from '@iwsdk/core';
 
 // Standard pool table dimensions (scaled for VR comfort)
@@ -181,6 +183,18 @@ export function createTable(world: World): Group {
   const footSpot = new Mesh(footSpotGeo, footSpotMat);
   footSpot.position.set(0, TABLE_HEIGHT + 0.002, -HL * 0.5);
   table.add(footSpot);
+
+  // Head spot
+  const headSpotGeo = new SphereGeometry(0.006, 8, 8);
+  const headSpotMat = new MeshBasicMaterial({ color: 0x00ffcc, transparent: true, opacity: 0.5 });
+  const headSpot = new Mesh(headSpotGeo, headSpotMat);
+  headSpot.position.set(0, TABLE_HEIGHT + 0.002, HL * 0.5);
+  table.add(headSpot);
+
+  // Rack triangle guide (faint outline at foot spot where balls are racked)
+  const rackTriangle = createRackTriangleGuide();
+  rackTriangle.position.set(0, TABLE_HEIGHT + 0.001, -HL * 0.5);
+  table.add(rackTriangle);
 
   // Edge glow strips along table perimeter
   createEdgeGlow(table);
@@ -348,6 +362,41 @@ function createEdgeGlow(table: Group) {
     strip.position.set(0, TABLE_HEIGHT, end * (HL + RAIL_WIDTH + 0.05));
     table.add(strip);
   }
+}
+
+function createRackTriangleGuide(): Group {
+  const g = new Group();
+  g.name = 'rack-guide';
+  const d = BALL_RADIUS * 2.02;
+  const rows = 5;
+  const triHeight = (rows - 1) * d * Math.sqrt(3) / 2;
+  const triBase = (rows - 1) * d;
+
+  // Faint triangle outline
+  const mat = new LineBasicMaterial({
+    color: 0x00aa88,
+    transparent: true,
+    opacity: 0.12,
+  });
+
+  // Triangle points: apex at (0,0), base below
+  const apex = new Vector3(0, 0, 0);
+  const baseLeft = new Vector3(-triBase / 2, 0, -triHeight);
+  const baseRight = new Vector3(triBase / 2, 0, -triHeight);
+
+  const createLine = (a: Vector3, b: Vector3) => {
+    const geo = new BufferGeometry();
+    geo.setAttribute('position', new Float32BufferAttribute([
+      a.x, a.y, a.z, b.x, b.y, b.z
+    ], 3));
+    return new LineSegments(geo, mat);
+  };
+
+  g.add(createLine(apex, baseLeft));
+  g.add(createLine(baseLeft, baseRight));
+  g.add(createLine(baseRight, apex));
+
+  return g;
 }
 
 function createLightFixture(table: Group) {
