@@ -272,6 +272,39 @@ export class AudioManager {
     });
   }
 
+  playAchievement(): void {
+    const ctx = this.ensureContext();
+    const now = ctx.currentTime;
+    // Bright, celebratory arpeggio with sparkle
+    const notes = [880, 1047, 1319, 1568, 2093]; // A5, C6, E6, G6, C7
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      const gain = ctx.createGain();
+      const t = now + i * 0.08;
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.15, t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+      osc.connect(gain);
+      gain.connect(this.sfxGain!);
+      osc.start(t);
+      osc.stop(t + 0.45);
+    });
+    // Extra shimmer
+    const shimmer = ctx.createOscillator();
+    shimmer.type = 'triangle';
+    shimmer.frequency.value = 3136; // G7
+    const shimGain = ctx.createGain();
+    shimGain.gain.setValueAtTime(0, now + 0.3);
+    shimGain.gain.linearRampToValueAtTime(0.08, now + 0.35);
+    shimGain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+    shimmer.connect(shimGain);
+    shimGain.connect(this.sfxGain!);
+    shimmer.start(now + 0.3);
+    shimmer.stop(now + 0.75);
+  }
+
   setMasterVolume(v: number): void {
     this.masterVolume = v;
     if (this.masterGain) this.masterGain.gain.value = v;

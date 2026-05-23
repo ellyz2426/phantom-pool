@@ -14,6 +14,8 @@ import { BallManager } from './balls';
 import { CueStick } from './cue';
 import { AudioManager } from './audio';
 import { CameraController } from './camera';
+import type { SpinSystem } from './spin';
+import type { AchievementManager, Achievement } from './achievements';
 
 type UIKitElement = { text: { value: string }; addEventListener: (event: string, cb: () => void) => void } | null;
 
@@ -32,15 +34,20 @@ interface UIEntities {
   leaderboardEntity: any;
   messageEntity: any;
   cameraEntity: any;
+  spinEntity: any;
+  achievementToastEntity: any;
+  achievementsEntity: any;
 }
 
 export interface UISystem {
   update: (game: GameManager, ballManager: BallManager, cue: CueStick) => void;
   updatePause: (isPaused: boolean) => void;
   updateCameraMode: (mode: string) => void;
+  updateSpin: (spinLabel: string) => void;
+  showAchievement: (achievement: Achievement) => void;
 }
 
-export function setupUI(world: World, game: GameManager, audio: AudioManager, cameraCtrl?: CameraController): UISystem {
+export function setupUI(world: World, game: GameManager, audio: AudioManager, cameraCtrl?: CameraController, spinSystem?: SpinSystem): UISystem {
   const entities: UIEntities = {} as any;
 
   // ---- TITLE SCREEN (world-space, in front of table) ----
@@ -89,6 +96,22 @@ export function setupUI(world: World, game: GameManager, audio: AudioManager, ca
   });
   entities.hudEntity = hudEntity;
 
+  // ---- SPIN INDICATOR HUD (head-following, left side) ----
+  const spinEntity = world.createTransformEntity(undefined, { persistent: true });
+  spinEntity.addComponent(PanelUI, {
+    config: '/ui/spin.json',
+    maxWidth: 0.18,
+    maxHeight: 0.08,
+  });
+  spinEntity.addComponent(Follower, {
+    target: world.player.head,
+    offsetPosition: [-0.22, -0.15, -0.5],
+    behavior: FollowBehavior.PivotY,
+    speed: 5,
+    tolerance: 0.3,
+  });
+  entities.spinEntity = spinEntity;
+
   // ---- PAUSE MENU (world-space) ----
   const pauseEntity = world.createTransformEntity(undefined, { persistent: true });
   pauseEntity.object3D.position.set(0, 1.6, -1.5);
@@ -129,6 +152,16 @@ export function setupUI(world: World, game: GameManager, audio: AudioManager, ca
   });
   entities.leaderboardEntity = leaderboardEntity;
 
+  // ---- ACHIEVEMENTS PANEL (world-space) ----
+  const achievementsEntity = world.createTransformEntity(undefined, { persistent: true });
+  achievementsEntity.object3D.position.set(0, 1.6, -1.8);
+  achievementsEntity.addComponent(PanelUI, {
+    config: '/ui/achievements.json',
+    maxWidth: 1.0,
+    maxHeight: 1.2,
+  });
+  entities.achievementsEntity = achievementsEntity;
+
   // ---- MESSAGE TOAST (head-following, top center) ----
   const messageEntity = world.createTransformEntity(undefined, { persistent: true });
   messageEntity.addComponent(PanelUI, {
@@ -144,6 +177,22 @@ export function setupUI(world: World, game: GameManager, audio: AudioManager, ca
     tolerance: 0.2,
   });
   entities.messageEntity = messageEntity;
+
+  // ---- ACHIEVEMENT TOAST (head-following, bottom center) ----
+  const achievementToastEntity = world.createTransformEntity(undefined, { persistent: true });
+  achievementToastEntity.addComponent(PanelUI, {
+    config: '/ui/achievement.json',
+    maxWidth: 0.45,
+    maxHeight: 0.1,
+  });
+  achievementToastEntity.addComponent(Follower, {
+    target: world.player.head,
+    offsetPosition: [0, -0.22, -0.5],
+    behavior: FollowBehavior.PivotY,
+    speed: 6,
+    tolerance: 0.2,
+  });
+  entities.achievementToastEntity = achievementToastEntity;
 
   // ---- CAMERA MODE INDICATOR (head-following, bottom right) ----
   const cameraEntity = world.createTransformEntity(undefined, { persistent: true });
@@ -165,6 +214,7 @@ export function setupUI(world: World, game: GameManager, audio: AudioManager, ca
   setTimeout(() => wireEvents(entities, game, audio, cameraCtrl), 500);
 
   let lastState: GameState | null = null;
+  let achievementToastTimer = 0;
 
   function update(game: GameManager, ballManager: BallManager, cue: CueStick) {
     const state = game.state;
@@ -175,16 +225,37 @@ export function setupUI(world: World, game: GameManager, audio: AudioManager, ca
     setVisible(entities.modeEntity, state === 'mode_select');
     setVisible(entities.difficultyEntity, state === 'difficulty_select');
     setVisible(entities.hudEntity, isPlaying);
+    setVisible(entities.spinEntity, state === 'aiming');
     setVisible(entities.pauseEntity, game.isPaused);
     setVisible(entities.gameOverEntity, state === 'game_over');
     setVisible(entities.settingsEntity, state === 'settings');
     setVisible(entities.leaderboardEntity, state === 'leaderboard');
+    setVisible(entities.achievementsEntity, state === 'achievements' as GameState);
     setVisible(entities.messageEntity, game.message !== '');
     setVisible(entities.cameraEntity, isPlaying);
+
+    // Achievement toast timer
+    if (achievementToastTimer > 0) {
+      achievementToastTimer -= 1 / 60; // Approximate dt
+      setVisible(entities.achievementToastEntity, true);
+      if (achievementToastTimer <= 0) {
+        setVisible(entities.achievementToastEntity, false);
+      }
+    } else {
+      setVisible(entities.achievementToastEntity, false);
+    }
 
     // Update HUD values
     if (isPlaying) {
       updateHUD(entities.hudEntity, game, ballManager, cue);
+    }
+
+    // Update spin indicator
+    if (state === 'aiming' && spinSystem) {
+      const spinDoc = getDoc(entities.spinEntity);
+      if (spinDoc) {
+        setText(spinDoc.getElementById('spin-text'), spinSystem.getSpinLabel());
+      }
     }
 
     // Update message
@@ -210,6 +281,11 @@ export function setupUI(world: World, game: GameManager, audio: AudioManager, ca
       updateLeaderboard(entities.leaderboardEntity, game);
     }
 
+    // Update achievements panel
+    if (state === 'achievements' as GameState) {
+      updateAchievementsPanel(entities.achievementsEntity, game.achievements);
+    }
+
     lastState = state;
   }
 
@@ -224,7 +300,24 @@ export function setupUI(world: World, game: GameManager, audio: AudioManager, ca
     }
   }
 
-  return { update, updatePause, updateCameraMode };
+  function updateSpin(spinLabel: string) {
+    const doc = getDoc(entities.spinEntity);
+    if (doc) {
+      setText(doc.getElementById('spin-text'), spinLabel);
+    }
+  }
+
+  function showAchievement(achievement: Achievement) {
+    const doc = getDoc(entities.achievementToastEntity);
+    if (doc) {
+      setText(doc.getElementById('ach-icon'), achievement.icon);
+      setText(doc.getElementById('ach-name'), achievement.name);
+      setText(doc.getElementById('ach-desc'), achievement.description);
+    }
+    achievementToastTimer = 4.0; // Show for 4 seconds
+  }
+
+  return { update, updatePause, updateCameraMode, updateSpin, showAchievement };
 }
 
 function setVisible(entity: any, visible: boolean) {
@@ -244,6 +337,7 @@ function wireEvents(entities: UIEntities, game: GameManager, audio: AudioManager
     titleDoc.getElementById('play-btn')?.addEventListener('click', () => game.showModeSelect());
     titleDoc.getElementById('settings-btn')?.addEventListener('click', () => { game.state = 'settings'; });
     titleDoc.getElementById('leaderboard-btn')?.addEventListener('click', () => { game.state = 'leaderboard'; });
+    titleDoc.getElementById('achievements-btn')?.addEventListener('click', () => { game.state = 'achievements' as any; });
   }
 
   // Mode select buttons
@@ -323,6 +417,12 @@ function wireEvents(entities: UIEntities, game: GameManager, audio: AudioManager
   if (lbDoc) {
     lbDoc.getElementById('back-btn')?.addEventListener('click', () => game.showTitle());
   }
+
+  // Achievements buttons
+  const achDoc = getDoc(entities.achievementsEntity);
+  if (achDoc) {
+    achDoc.getElementById('back-btn')?.addEventListener('click', () => game.showTitle());
+  }
 }
 
 function updateHUD(entity: any, game: GameManager, ballManager: BallManager, cue: CueStick) {
@@ -375,12 +475,6 @@ function updateGameOver(entity: any, game: GameManager) {
     statsText += ` | Match: ${ms.p1Wins}-${ms.p2Wins}`;
   }
   setText(doc.getElementById('stats-text'), statsText);
-
-  // Update replay button text
-  const replayBtn = doc.getElementById('replay-btn');
-  if (replayBtn) {
-    // Can't change button text after creation easily, but the label is inside
-  }
 }
 
 function updateLeaderboard(entity: any, game: GameManager) {
@@ -393,6 +487,26 @@ function updateLeaderboard(entity: any, game: GameManager) {
       setText(doc.getElementById(`lb-entry-${i}`), `${i + 1}. ${entry.name} - ${entry.mode} - ${entry.shots} shots - ${entry.date}`);
     } else {
       setText(doc.getElementById(`lb-entry-${i}`), `${i + 1}. ---`);
+    }
+  }
+}
+
+function updateAchievementsPanel(entity: any, achievements: AchievementManager) {
+  const doc = getDoc(entity);
+  if (!doc) return;
+
+  setText(doc.getElementById('ach-counter'), `${achievements.getUnlockedCount()} / ${achievements.getTotalCount()}`);
+
+  for (let i = 0; i < achievements.achievements.length && i < 15; i++) {
+    const ach = achievements.achievements[i];
+    if (ach.unlocked) {
+      setText(doc.getElementById(`ach-i-${i}`), ach.icon);
+      setText(doc.getElementById(`ach-n-${i}`), ach.name);
+      setText(doc.getElementById(`ach-d-${i}`), ach.description);
+    } else {
+      setText(doc.getElementById(`ach-i-${i}`), '🔒');
+      setText(doc.getElementById(`ach-n-${i}`), '???');
+      setText(doc.getElementById(`ach-d-${i}`), '???');
     }
   }
 }

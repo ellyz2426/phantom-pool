@@ -61,6 +61,25 @@ export class PhysicsEngine {
         if (ball.velocity.length() < MIN_VELOCITY) {
           ball.velocity.set(0, 0, 0);
           ball.angularVelocity.set(0, 0, 0);
+          ball.spin = { x: 0, y: 0 };
+        }
+
+        // Decay spin over time (friction absorbs spin energy)
+        if (ball.id === CUE_BALL_ID) {
+          ball.spin.x *= 0.998;
+          ball.spin.y *= 0.998;
+          if (Math.abs(ball.spin.x) < 0.01) ball.spin.x = 0;
+          if (Math.abs(ball.spin.y) < 0.01) ball.spin.y = 0;
+
+          // Side spin (english) causes gradual curve
+          if (Math.abs(ball.spin.x) > 0.05 && ball.velocity.length() > 0.1) {
+            const speed = ball.velocity.length();
+            const perpX = -ball.velocity.z / speed;
+            const perpZ = ball.velocity.x / speed;
+            const curveFactor = ball.spin.x * 0.002 * speed;
+            ball.velocity.x += perpX * curveFactor * subDt;
+            ball.velocity.z += perpZ * curveFactor * subDt;
+          }
         }
       }
 
@@ -133,6 +152,28 @@ export class PhysicsEngine {
       a.velocity.z -= impulse * nz;
       b.velocity.x += impulse * nx;
       b.velocity.z += impulse * nz;
+
+      // Apply post-collision spin effects on cue ball
+      const cueBall = a.id === CUE_BALL_ID ? a : (b.id === CUE_BALL_ID ? b : null);
+      if (cueBall && (Math.abs(cueBall.spin.x) > 0.05 || Math.abs(cueBall.spin.y) > 0.05)) {
+        // Backspin: reduce cue ball forward momentum after collision (can reverse)
+        // Topspin: add forward momentum after collision
+        const fwdX = -nx;
+        const fwdZ = -nz;
+        const spinMag = dvn * 0.35;
+        cueBall.velocity.x += fwdX * cueBall.spin.y * spinMag;
+        cueBall.velocity.z += fwdZ * cueBall.spin.y * spinMag;
+
+        // Side english: deflect cue ball perpendicular after collision
+        const perpX = -nz;
+        const perpZ = nx;
+        cueBall.velocity.x += perpX * cueBall.spin.x * spinMag * 0.4;
+        cueBall.velocity.z += perpZ * cueBall.spin.x * spinMag * 0.4;
+
+        // Decay spin after application
+        cueBall.spin.x *= 0.3;
+        cueBall.spin.y *= 0.3;
+      }
 
       // Separate balls
       const overlap = minDist - dist;

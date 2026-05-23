@@ -6,10 +6,12 @@ import { CueStick } from './cue';
 import { AudioManager } from './audio';
 import { TABLE_HEIGHT, TABLE_LENGTH, TABLE_WIDTH } from './table';
 import { AIOpponent, AIDifficulty } from './ai';
+import { AchievementManager } from './achievements';
+import type { SpinSystem } from './spin';
 import type { EffectsManager } from './effects';
 
 export type GameMode = '8ball' | '9ball' | 'freeplay' | 'trickshot';
-export type GameState = 'title' | 'mode_select' | 'difficulty_select' | 'playing' | 'aiming' | 'shooting' | 'watching' | 'ball_in_hand' | 'game_over' | 'paused' | 'settings' | 'leaderboard';
+export type GameState = 'title' | 'mode_select' | 'difficulty_select' | 'playing' | 'aiming' | 'shooting' | 'watching' | 'ball_in_hand' | 'game_over' | 'paused' | 'settings' | 'leaderboard' | 'achievements';
 export type PlayerAssignment = 'solids' | 'stripes' | 'none';
 
 export interface Player {
@@ -78,7 +80,13 @@ export class GameManager {
   // Leaderboard
   leaderboard: { name: string; mode: string; shots: number; date: string }[] = [];
 
+  achievements: AchievementManager;
+  spinSystem: SpinSystem | null = null;
+  isBreakShot: boolean = false;
+  currentGameFouls: number = 0;
+
   onUIUpdate: (() => void) | null = null;
+  onAchievementUnlock: ((ach: { id: string; name: string; description: string; icon: string }) => void) | null = null;
 
   constructor(ballManager: BallManager, physics: PhysicsEngine, cueStick: CueStick, audio: AudioManager, effects: EffectsManager) {
     this.ballManager = ballManager;
@@ -87,9 +95,20 @@ export class GameManager {
     this.audio = audio;
     this.effects = effects;
     this.ai = new AIOpponent('medium');
+    this.achievements = new AchievementManager();
+
+    this.achievements.onUnlock = (ach) => {
+      if (this.onAchievementUnlock) {
+        this.onAchievementUnlock(ach);
+      }
+    };
 
     this.loadStats();
     this.initTrickShots();
+  }
+
+  setSpinSystem(spin: SpinSystem): void {
+    this.spinSystem = spin;
   }
 
   showTitle(): void {
@@ -127,6 +146,11 @@ export class GameManager {
     this.shotCount = 0;
     this.assignmentsDone = false;
     this.currentStreak = 0;
+    this.isBreakShot = true;
+    this.currentGameFouls = 0;
+
+    // Reset spin
+    if (this.spinSystem) this.spinSystem.reset();
 
     // Initialize players
     const p2Name = this.useAI
@@ -172,6 +196,18 @@ export class GameManager {
     this.state = 'shooting';
     this.shotCount++;
     this.physics.resetShotTracking();
+
+    // Track spin usage for achievements
+    if (this.spinSystem) {
+      const spin = this.spinSystem.spin;
+      this.achievements.checkAchievements({
+        spinUsed: {
+          back: spin.y < -0.3,
+          top: spin.y > 0.3,
+          english: Math.abs(spin.x) > 0.3,
+        },
+      });
+    }
 
     setTimeout(() => {
       if (this.state === 'shooting') {
@@ -242,6 +278,7 @@ export class GameManager {
 
     if (foul) {
       currentPlayer.fouls++;
+      this.currentGameFouls++;
       if (cueScratch) {
         this.handleBallInHand();
       } else {
@@ -315,14 +352,24 @@ export class GameManager {
       this.currentStreak++;
       this.bestStreak = Math.max(this.bestStreak, this.currentStreak);
       this.showMessage('NICE SHOT!', 1.0);
+
+      // Achievement checks for pocketing
+      this.achievements.checkAchievements({
+        ballsPocketed: objectBallsPocketed.length,
+        consecutivePockets: this.currentStreak,
+        multiPocket: objectBallsPocketed.length >= 2,
+        breakPocket: this.isBreakShot,
+      });
     } else {
       this.currentStreak = 0;
       this.switchPlayer();
     }
 
+    this.isBreakShot = false;
     this.state = 'aiming';
     this.cueStick.show();
     this.cueStick.setAimAngle(this.cueStick.aimAngle);
+    if (this.spinSystem) this.spinSystem.reset();
     this.checkAndStartAI();
   }
 
@@ -400,6 +447,17 @@ export class GameManager {
     this.totalGames++;
     this.cueStick.hide();
 
+    // Achievement checks
+    const isPlayerWin = winnerIndex === 0;
+    const noFouls = this.players[winnerIndex].fouls === 0;
+    this.achievements.checkAchievements({
+      gameCompleted: true,
+      gameWon: isPlayerWin,
+      noFouls: isPlayerWin && noFouls,
+      difficulty: this.useAI ? this.aiDifficulty : undefined,
+      mode: this.mode,
+    });
+
     // Update match state
     if (this.match) {
       if (winnerIndex === 0) this.match.p1Wins++;
@@ -410,6 +468,8 @@ export class GameManager {
         // Match over
         const matchWinner = this.match.p1Wins >= neededWins ? this.players[0].name : this.players[1].name;
         this.showMessage(`${matchWinner} WINS THE MATCH! (${this.match.p1Wins}-${this.match.p2Wins})`, 4.0);
+        const matchWonByPlayer = this.match.p1Wins >= neededWins;
+        this.achievements.checkAchievements({ matchWon: matchWonByPlayer });
         this.match = null;
       } else {
         this.match.currentGame++;

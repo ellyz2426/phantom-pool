@@ -1,0 +1,125 @@
+<style>
+  .achievements-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 2;
+    padding-bottom: 2;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(0, 5, 15, 0.92);
+    border-color: #ffaa00;
+    border-width: 0.12;
+    border-radius: 1.5;
+    gap: 0.6;
+  }
+  .title {
+    font-size: 2.5;
+    color: #ffaa00;
+    font-weight: bold;
+  }
+  .counter {
+    font-size: 1.2;
+    color: #886600;
+  }
+  .ach-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-top: 0.3;
+    padding-bottom: 0.3;
+    padding-left: 1;
+    padding-right: 1;
+    gap: 0.8;
+    min-width: 22;
+    background-color: rgba(20, 15, 0, 0.4);
+    border-color: #332200;
+    border-width: 0.04;
+    border-radius: 0.3;
+  }
+  .ach-row-unlocked {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-top: 0.3;
+    padding-bottom: 0.3;
+    padding-left: 1;
+    padding-right: 1;
+    gap: 0.8;
+    min-width: 22;
+    background-color: rgba(40, 30, 0, 0.5);
+    border-color: #664400;
+    border-width: 0.04;
+    border-radius: 0.3;
+  }
+  .ach-icon {
+    font-size: 1.5;
+    color: #ffaa00;
+  }
+  .ach-icon-locked {
+    font-size: 1.5;
+    color: #333333;
+  }
+  .ach-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1;
+  }
+  .ach-name {
+    font-size: 1.2;
+    color: #ffcc44;
+    font-weight: bold;
+  }
+  .ach-name-locked {
+    font-size: 1.2;
+    color: #555555;
+  }
+  .ach-desc {
+    font-size: 0.8;
+    color: #886644;
+  }
+  .ach-desc-locked {
+    font-size: 0.8;
+    color: #444444;
+  }
+  .back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.5;
+    padding-bottom: 0.5;
+    padding-left: 2;
+    padding-right: 2;
+    background-color: rgba(60, 20, 20, 0.5);
+    border-color: #ff4444;
+    border-width: 0.06;
+    border-radius: 0.4;
+    cursor: pointer;
+  }
+  .back-text {
+    font-size: 1.4;
+    color: #ff6666;
+  }
+</style>
+<div class="achievements-panel">
+  <span class="title">ACHIEVEMENTS</span>
+  <span id="ach-counter" class="counter">0 / 15</span>
+  <div id="ach-row-0" class="ach-row"><span id="ach-i-0" class="ach-icon-locked">🔒</span><div class="ach-text"><span id="ach-n-0" class="ach-name-locked">???</span><span id="ach-d-0" class="ach-desc-locked">???</span></div></div>
+  <div id="ach-row-1" class="ach-row"><span id="ach-i-1" class="ach-icon-locked">🔒</span><div class="ach-text"><span id="ach-n-1" class="ach-name-locked">???</span><span id="ach-d-1" class="ach-desc-locked">???</span></div></div>
+  <div id="ach-row-2" class="ach-row"><span id="ach-i-2" class="ach-icon-locked">🔒</span><div class="ach-text"><span id="ach-n-2" class="ach-name-locked">???</span><span id="ach-d-2" class="ach-desc-locked">???</span></div></div>
+  <div id="ach-row-3" class="ach-row"><span id="ach-i-3" class="ach-icon-locked">🔒</span><div class="ach-text"><span id="ach-n-3" class="ach-name-locked">???</span><span id="ach-d-3" class="ach-desc-locked">???</span></div></div>
+  <div id="ach-row-4" class="ach-row"><span id="ach-i-4" class="ach-icon-locked">🔒</span><div class="ach-text"><span id="ach-n-4" class="ach-name-locked">???</span><span id="ach-d-4" class="ach-desc-locked">???</span></div></div>
+  <div id="ach-row-5" class="ach-row"><span id="ach-i-5" class="ach-icon-locked">🔒</span><div class="ach-text"><span id="ach-n-5" class="ach-name-locked">???</span><span id="ach-d-5" class="ach-desc-locked">???</span></div></div>
+  <div id="ach-row-6" class="ach-row"><span id="ach-i-6" class="ach-icon-locked">🔒</span><div class="ach-text"><span id="ach-n-6" class="ach-name-locked">???</span><span id="ach-d-6" class="ach-desc-locked">???</span></div></div>
+  <div id="ach-row-7" class="ach-row"><span id="ach-i-7" class="ach-icon-locked">🔒</span><div class="ach-text"><span id="ach-n-7" class="ach-name-locked">???</span><span id="ach-d-7" class="ach-desc-locked">???</span></div></div>
+  <div id="ach-row-8" class="ach-row"><span id="ach-i-8" class="ach-icon-locked">🔒</span><div class="ach-text"><span id="ach-n-8" class="ach-name-locked">???</span><span id="ach-d-8" class="ach-desc-locked">???</span></div></div>
+  <div id="ach-row-9" class="ach-row"><span id="ach-i-9" class="ach-icon-locked">🔒</span><div class="ach-text"><span id="ach-n-9" class="ach-name-locked">???</span><span id="ach-d-9" class="ach-desc-locked">???</span></div></div>
+  <div id="ach-row-10" class="ach-row"><span id="ach-i-10" class="ach-icon-locked">🔒</span><div class="ach-text"><span id="ach-n-10" class="ach-name-locked">???</span><span id="ach-d-10" class="ach-desc-locked">???</span></div></div>
+  <div id="ach-row-11" class="ach-row"><span id="ach-i-11" class="ach-icon-locked">🔒</span><div class="ach-text"><span id="ach-n-11" class="ach-name-locked">???</span><span id="ach-d-11" class="ach-desc-locked">???</span></div></div>
+  <div id="ach-row-12" class="ach-row"><span id="ach-i-12" class="ach-icon-locked">🔒</span><div class="ach-text"><span id="ach-n-12" class="ach-name-locked">???</span><span id="ach-d-12" class="ach-desc-locked">???</span></div></div>
+  <div id="ach-row-13" class="ach-row"><span id="ach-i-13" class="ach-icon-locked">🔒</span><div class="ach-text"><span id="ach-n-13" class="ach-name-locked">???</span><span id="ach-d-13" class="ach-desc-locked">???</span></div></div>
+  <div id="ach-row-14" class="ach-row"><span id="ach-i-14" class="ach-icon-locked">🔒</span><div class="ach-text"><span id="ach-n-14" class="ach-name-locked">???</span><span id="ach-d-14" class="ach-desc-locked">???</span></div></div>
+  <button id="back-btn" class="back-btn" cursor="pointer">
+    <span class="back-text">BACK</span>
+  </button>
+</div>

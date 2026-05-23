@@ -1,5 +1,5 @@
 // Phantom Pool VR - Main Entry Point
-// Holodeck billiards with physics-based cue stick mechanics
+// Holodeck billiards with physics-based cue stick mechanics, spin/english, and achievements
 
 import {
   World,
@@ -48,6 +48,7 @@ import { XRInputHandler } from './xrinput';
 import { EffectsManager } from './effects';
 import { CameraController } from './camera';
 import { PocketedBallTray } from './tray';
+import { SpinSystem } from './spin';
 
 async function main() {
   const container = document.getElementById('scene-container') as HTMLDivElement;
@@ -101,11 +102,22 @@ async function main() {
   // Create pocketed ball tray
   const tray = new PocketedBallTray(world);
 
+  // Create spin system
+  const spinSystem = new SpinSystem(world);
+  gameManager.setSpinSystem(spinSystem);
+  cueStick.setSpinSystem(spinSystem);
+
   // Setup UI (all PanelUI, zero HTML DOM)
-  const ui = setupUI(world, gameManager, audioManager, cameraCtrl);
+  const ui = setupUI(world, gameManager, audioManager, cameraCtrl, spinSystem);
+
+  // Wire achievement notifications to UI
+  gameManager.onAchievementUnlock = (ach) => {
+    ui.showAchievement(ach);
+    audioManager.playAchievement();
+  };
 
   // XR input handler
-  const xrInput = new XRInputHandler(world, gameManager, cueStick, ballManager);
+  const xrInput = new XRInputHandler(world, gameManager, cueStick, ballManager, spinSystem);
 
   // Browser mouse input
   let isDragging = false;
@@ -194,6 +206,27 @@ async function main() {
       cameraCtrl.setMode('follow');
       ui.updateCameraMode(cameraCtrl.getModeName());
     }
+
+    // Spin controls (arrow keys)
+    if (gameManager.state === 'aiming' && !gameManager.isCurrentPlayerAI()) {
+      const spinStep = 0.15;
+      if (e.key === 'ArrowLeft') {
+        spinSystem.adjustSpin(-spinStep, 0);
+        ui.updateSpin(spinSystem.getSpinLabel());
+      } else if (e.key === 'ArrowRight') {
+        spinSystem.adjustSpin(spinStep, 0);
+        ui.updateSpin(spinSystem.getSpinLabel());
+      } else if (e.key === 'ArrowUp') {
+        spinSystem.adjustSpin(0, spinStep);
+        ui.updateSpin(spinSystem.getSpinLabel());
+      } else if (e.key === 'ArrowDown') {
+        spinSystem.adjustSpin(0, -spinStep);
+        ui.updateSpin(spinSystem.getSpinLabel());
+      } else if (e.key === 'x' || e.key === 'X') {
+        spinSystem.reset();
+        ui.updateSpin(spinSystem.getSpinLabel());
+      }
+    }
   });
 
   window.addEventListener('keyup', (e) => {
@@ -238,6 +271,17 @@ async function main() {
 
       // Update pocketed ball tray
       tray.update(dt, ballManager, gameManager.currentPlayerIndex);
+
+      // Update spin indicator position
+      if (gameManager.state === 'aiming') {
+        const cueBall = ballManager.getCueBall();
+        if (cueBall && !cueBall.pocketed) {
+          spinSystem.show();
+          spinSystem.updatePosition(cueBall.position, cueStick.aimDir);
+        }
+      } else {
+        spinSystem.hide();
+      }
 
       // Update cue ball trail
       const cueBall = ballManager.getCueBall();

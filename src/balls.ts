@@ -52,6 +52,7 @@ export interface PoolBall {
   angularVelocity: Vector3;
   pocketed: boolean;
   isMoving: boolean;
+  spin: { x: number; y: number };  // English state from cue shot
 }
 
 export class BallManager {
@@ -173,6 +174,7 @@ export class BallManager {
       id, mesh, glow, shadow, wireframe, stripe,
       position, velocity, angularVelocity,
       pocketed: false, isMoving: false,
+      spin: { x: 0, y: 0 },
     };
   }
 

@@ -8,23 +8,26 @@ import {
 import { GameManager } from './game';
 import { CueStick } from './cue';
 import { BallManager } from './balls';
+import type { SpinSystem } from './spin';
 
 export class XRInputHandler {
   world: World;
   game: GameManager;
   cue: CueStick;
   ballManager: BallManager;
+  spinSystem: SpinSystem | null;
 
   private triggerWasDown: boolean = false;
   private aWasDown: boolean = false;
   private bWasDown: boolean = false;
   private thumbstickCooldown: number = 0;
 
-  constructor(world: World, game: GameManager, cue: CueStick, ballManager: BallManager) {
+  constructor(world: World, game: GameManager, cue: CueStick, ballManager: BallManager, spinSystem?: SpinSystem) {
     this.world = world;
     this.game = game;
     this.cue = cue;
     this.ballManager = ballManager;
+    this.spinSystem = spinSystem || null;
   }
 
   update(dt: number): void {
@@ -62,6 +65,18 @@ export class XRInputHandler {
         // Aim with right thumbstick
         if (Math.abs(thumbstick.x) > 0.15) {
           this.cue.updateAimFromController(thumbstick.x);
+        }
+
+        // Spin control with left thumbstick
+        if (this.spinSystem && leftThumbstick) {
+          if (Math.abs(leftThumbstick.x) > 0.15 || Math.abs(leftThumbstick.y) > 0.15) {
+            this.spinSystem.adjustSpin(leftThumbstick.x * dt * 2, leftThumbstick.y * dt * 2);
+          }
+        }
+
+        // Squeeze to reset spin
+        if (squeezePressed && this.spinSystem) {
+          this.spinSystem.reset();
         }
 
         // Trigger to charge

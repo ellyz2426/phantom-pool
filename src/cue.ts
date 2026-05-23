@@ -20,6 +20,7 @@ import { BallManager, CUE_BALL_ID, PoolBall } from './balls';
 import { TABLE_HEIGHT, BALL_RADIUS, TABLE_WIDTH, TABLE_LENGTH } from './table';
 import { GameManager } from './game';
 import { AudioManager } from './audio';
+import type { SpinSystem } from './spin';
 
 const CUE_LENGTH = 1.4;
 const CUE_THICK_RADIUS = 0.012;
@@ -39,6 +40,7 @@ export class CueStick {
   powerIndicator: Mesh;
   world: World;
   ballManager: BallManager;
+  spinSystem: SpinSystem | null = null;
 
   aimAngle: number = 0;        // Radians around Y axis
   power: number = 0;
@@ -171,6 +173,10 @@ export class CueStick {
     this.powerIndicator.visible = true;
   }
 
+  setSpinSystem(spin: SpinSystem): void {
+    this.spinSystem = spin;
+  }
+
   release(game: GameManager, audio: AudioManager): void {
     if (!this.isCharging || this.power < 0.1) {
       this.isCharging = false;
@@ -189,6 +195,15 @@ export class CueStick {
       0,
       -this.aimDir.z * shotPower
     );
+
+    // Apply spin forces
+    if (this.spinSystem) {
+      const spinVel = this.spinSystem.getSpinVelocity(this.aimDir, shotPower);
+      cueBall.velocity.x += spinVel.x;
+      cueBall.velocity.z += spinVel.z;
+      // Store spin for post-collision application
+      cueBall.spin = { x: this.spinSystem.spin.x, y: this.spinSystem.spin.y };
+    }
 
     audio.playCueHit(shotPower / MAX_POWER);
 
