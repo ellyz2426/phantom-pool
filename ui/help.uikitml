@@ -84,6 +84,8 @@
   <div class="control-row"><span class="key-label">Arrow Keys</span><span class="key-desc">Adjust spin/english</span></div>
   <div class="control-row"><span class="key-label">X</span><span class="key-desc">Reset spin</span></div>
   <div class="control-row"><span class="key-label">C / 1-4</span><span class="key-desc">Change camera</span></div>
+  <div class="control-row"><span class="key-label">V</span><span class="key-desc">Replay last shot</span></div>
+  <div class="control-row"><span class="key-label">T</span><span class="key-desc">Cycle table theme</span></div>
   <div class="control-row"><span class="key-label">ESC</span><span class="key-desc">Pause game</span></div>
   <div class="divider"></div>
   <span class="section-title">🎮 VR CONTROLLERS</span>

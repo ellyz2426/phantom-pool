@@ -49,6 +49,7 @@ import { EffectsManager } from './effects';
 import { CameraController } from './camera';
 import { PocketedBallTray } from './tray';
 import { SpinSystem } from './spin';
+import { ThemeManager, ThemeColors } from './themes';
 
 async function main() {
   const container = document.getElementById('scene-container') as HTMLDivElement;
@@ -109,14 +110,26 @@ async function main() {
   cueStick.setEffects(effects);
   cueStick.setCameraController(cameraCtrl);
 
+  // Create theme manager
+  const themeManager = new ThemeManager();
+  themeManager.loadTheme();
+
   // Setup UI (all PanelUI, zero HTML DOM)
-  const ui = setupUI(world, gameManager, audioManager, cameraCtrl, spinSystem);
+  const ui = setupUI(world, gameManager, audioManager, cameraCtrl, spinSystem, themeManager);
 
   // Wire achievement notifications to UI
   gameManager.onAchievementUnlock = (ach) => {
     ui.showAchievement(ach);
     audioManager.playAchievement();
   };
+
+  // Wire theme changes
+  themeManager.onChange((theme: ThemeColors) => {
+    ui.updateThemeLabel(theme.name);
+    applyTheme(world, theme);
+  });
+  // Apply initial theme
+  applyTheme(world, themeManager.current);
 
   // XR input handler
   const xrInput = new XRInputHandler(world, gameManager, cueStick, ballManager, spinSystem);
@@ -195,6 +208,18 @@ async function main() {
       // Cycle camera mode
       cameraCtrl.cycleMode();
       ui.updateCameraMode(cameraCtrl.getModeName());
+    } else if (e.key === 'v' || e.key === 'V') {
+      // Replay last shot
+      if (gameManager.state === 'aiming' && gameManager.replay.hasReplay) {
+        gameManager.startReplay();
+      } else if (gameManager.state === 'replay' as any) {
+        gameManager.stopReplay();
+      }
+    } else if (e.key === 't' || e.key === 'T') {
+      // Cycle theme
+      if (gameManager.state === 'aiming' || gameManager.state === 'title') {
+        themeManager.cycleTheme();
+      }
     } else if (e.key === '1') {
       cameraCtrl.setMode('orbit');
       ui.updateCameraMode(cameraCtrl.getModeName());
@@ -256,6 +281,32 @@ async function main() {
       // Update physics
       physics.update(dt, gameManager, audioManager, effects);
 
+      // Record replay frames during shot
+      if (gameManager.replay.recording) {
+        gameManager.replay.recordFrame(
+          ballManager.balls.map(b => ({
+            id: b.id,
+            position: b.position.clone(),
+            pocketed: b.pocketed,
+          }))
+        );
+      }
+
+      // Update replay playback
+      if (gameManager.replay.playing) {
+        const frame = gameManager.replay.update(dt);
+        if (frame) {
+          // Apply replay ball positions
+          for (const bf of frame.balls) {
+            const ball = ballManager.getBall(bf.id);
+            if (ball) {
+              ball.position.set(bf.x, bf.y, bf.z);
+              ball.pocketed = bf.pocketed;
+            }
+          }
+        }
+      }
+
       // Update cue stick
       cueStick.update(dt, world);
 
@@ -313,6 +364,55 @@ async function main() {
 
   // Start at title screen
   gameManager.showTitle();
+}
+
+// Apply theme colors to scene materials
+function applyTheme(world: World, theme: ThemeColors): void {
+  const scene = world.scene;
+
+  // Update table materials
+  scene.traverse((obj: any) => {
+    if (!obj.isMesh && !obj.isLineSegments) return;
+
+    const name = obj.name || obj.parent?.name || '';
+
+    // Pool table surface
+    if (obj.material?.color && obj.material instanceof MeshStandardMaterial) {
+      if (name === 'pool-table' || (obj.parent?.name === 'pool-table')) {
+        // Only update specific parts based on current color
+        const hex = obj.material.color.getHex();
+        if (hex === 0x004d33 || hex === 0x2a0028 || hex === 0x1a3300 || hex === 0x0d0033) {
+          // Felt surface
+          obj.material.color.setHex(theme.feltColor);
+          obj.material.emissive.setHex(theme.feltEmissive);
+          obj.material.emissiveIntensity = theme.feltEmissiveIntensity;
+        }
+      }
+    }
+  });
+
+  // Update lights
+  scene.traverse((obj: any) => {
+    if (obj.isPointLight) {
+      const hex = obj.color.getHex();
+      // Primary table light
+      if (hex === 0x00ddff || hex === 0xff44cc || hex === 0xffdd88 || hex === 0xaa66ff) {
+        obj.color.setHex(theme.primaryLight);
+      }
+      // Secondary lights
+      if (hex === 0x00ff88 || hex === 0xff8800 || hex === 0xffaa44 || hex === 0x00ccff) {
+        obj.color.setHex(theme.secondaryLight);
+      }
+      if (hex === 0x8800ff || hex === 0x4400ff || hex === 0x886622 || hex === 0xff44aa) {
+        obj.color.setHex(theme.tertiaryLight);
+      }
+    }
+  });
+
+  // Update fog
+  if (scene.fog) {
+    (scene.fog as any).color.setHex(theme.fogColor);
+  }
 }
 
 main().catch(console.error);

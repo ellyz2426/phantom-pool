@@ -9,9 +9,11 @@ import { AIOpponent, AIDifficulty } from './ai';
 import { AchievementManager } from './achievements';
 import type { SpinSystem } from './spin';
 import type { EffectsManager } from './effects';
+import { TournamentManager } from './tournament';
+import { ReplaySystem } from './replay';
 
 export type GameMode = '8ball' | '9ball' | 'freeplay' | 'trickshot';
-export type GameState = 'title' | 'mode_select' | 'difficulty_select' | 'playing' | 'aiming' | 'shooting' | 'watching' | 'ball_in_hand' | 'game_over' | 'paused' | 'settings' | 'leaderboard' | 'achievements' | 'help';
+export type GameState = 'title' | 'mode_select' | 'difficulty_select' | 'playing' | 'aiming' | 'shooting' | 'watching' | 'ball_in_hand' | 'game_over' | 'paused' | 'settings' | 'leaderboard' | 'achievements' | 'help' | 'tournament' | 'themes' | 'replay';
 export type PlayerAssignment = 'solids' | 'stripes' | 'none';
 
 export interface Player {
@@ -85,6 +87,13 @@ export class GameManager {
   isBreakShot: boolean = false;
   currentGameFouls: number = 0;
 
+  // Tournament
+  tournament: TournamentManager;
+  isTournamentGame: boolean = false;
+
+  // Replay
+  replay: ReplaySystem;
+
   onUIUpdate: (() => void) | null = null;
   onAchievementUnlock: ((ach: { id: string; name: string; description: string; icon: string; unlocked: boolean }) => void) | null = null;
 
@@ -96,6 +105,8 @@ export class GameManager {
     this.effects = effects;
     this.ai = new AIOpponent('medium');
     this.achievements = new AchievementManager();
+    this.tournament = new TournamentManager();
+    this.replay = new ReplaySystem();
 
     this.achievements.onUnlock = (ach) => {
       if (this.onAchievementUnlock) {
@@ -197,6 +208,9 @@ export class GameManager {
     this.shotCount++;
     this.physics.resetShotTracking();
 
+    // Start recording for replay
+    this.replay.startRecording();
+
     // Track spin usage for achievements
     if (this.spinSystem) {
       const spin = this.spinSystem.spin;
@@ -217,6 +231,9 @@ export class GameManager {
   }
 
   onShotComplete(physics: PhysicsEngine): void {
+    // Stop replay recording
+    this.replay.stopRecording();
+
     const pocketed = physics.pocketedThisShot;
     const firstHit = physics.firstHitBallId;
     const cueScratch = physics.cueBallPocketed;
@@ -465,6 +482,11 @@ export class GameManager {
     this.state = 'game_over';
     this.totalGames++;
     this.cueStick.hide();
+
+    // Handle tournament
+    if (this.isTournamentGame) {
+      this.endTournamentGame(winnerIndex === 0);
+    }
 
     // Achievement checks
     const isPlayerWin = winnerIndex === 0;
@@ -724,6 +746,51 @@ export class GameManager {
 
     this.state = 'aiming';
     this.cueStick.show();
+  }
+
+  // Tournament methods
+  showTournament(): void {
+    this.state = 'tournament' as GameState;
+  }
+
+  startTournamentGame(): void {
+    if (!this.tournament.isActive()) return;
+    const match = this.tournament.getCurrentMatch();
+    if (!match) return;
+
+    this.isTournamentGame = true;
+    const opponent = this.tournament.getPlayerOpponent();
+    if (opponent) {
+      this.useAI = true;
+      this.aiDifficulty = this.tournament.getCurrentDifficulty();
+      this.ai.setDifficultyParams(this.aiDifficulty);
+      this.startGame('8ball');
+      // Override AI name
+      this.players[1].name = opponent;
+    }
+  }
+
+  endTournamentGame(playerWon: boolean): void {
+    this.tournament.recordResult(playerWon);
+    this.isTournamentGame = false;
+  }
+
+  // Replay methods
+  startReplay(): boolean {
+    if (!this.replay.hasReplay) return false;
+    this.state = 'replay' as GameState;
+    return this.replay.startReplay();
+  }
+
+  stopReplay(): void {
+    this.replay.stopReplay();
+    this.state = 'aiming';
+    this.cueStick.show();
+  }
+
+  // Themes
+  showThemes(): void {
+    this.state = 'themes' as GameState;
   }
 
   loadStats(): void {

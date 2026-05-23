@@ -1,0 +1,100 @@
+<!-- Theme Selection Panel -->
+<style>
+  .theme-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3;
+    background-color: rgba(0, 0, 0, 0.92);
+    border-color: #00ffcc;
+    border-width: 0.15;
+    border-radius: 1.5;
+    gap: 1.5;
+  }
+  .theme-title {
+    font-size: 3;
+    color: #00ffcc;
+    font-weight: bold;
+  }
+  .theme-subtitle {
+    font-size: 1.5;
+    color: #888888;
+  }
+  .theme-row {
+    display: flex;
+    flex-direction: row;
+    gap: 1;
+    align-items: center;
+    justify-content: center;
+  }
+  .theme-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5;
+    background-color: rgba(0, 255, 204, 0.08);
+    border-color: #00ffcc;
+    border-width: 0.08;
+    border-radius: 1;
+    cursor: pointer;
+    min-width: 14;
+  }
+  .theme-btn:hover {
+    background-color: rgba(0, 255, 204, 0.2);
+  }
+  .theme-name {
+    font-size: 1.8;
+    color: #ffffff;
+    font-weight: bold;
+  }
+  .theme-preview {
+    font-size: 3;
+  }
+  .theme-cyan .theme-preview { color: #00ffcc; }
+  .theme-pink .theme-preview { color: #ff44cc; }
+  .theme-gold .theme-preview { color: #ffdd44; }
+  .theme-purple .theme-preview { color: #bb66ff; }
+  .theme-current {
+    font-size: 1.2;
+    color: #00ff88;
+    font-weight: bold;
+  }
+  .back-btn {
+    font-size: 2;
+    color: #888888;
+    padding: 1;
+    cursor: pointer;
+    border-color: #444444;
+    border-width: 0.05;
+    border-radius: 0.5;
+  }
+  .back-btn:hover {
+    color: #ffffff;
+  }
+</style>
+<div class="theme-panel">
+  <span class="theme-title">TABLE THEMES</span>
+  <span class="theme-subtitle">Choose your neon palette</span>
+  <span id="current-theme" class="theme-current">Current: NEON CYAN</span>
+  <div class="theme-row">
+    <div id="theme-cyan" class="theme-btn theme-cyan" cursor="pointer">
+      <span class="theme-preview">◆</span>
+      <span class="theme-name">NEON CYAN</span>
+    </div>
+    <div id="theme-pink" class="theme-btn theme-pink" cursor="pointer">
+      <span class="theme-preview">◆</span>
+      <span class="theme-name">NEON PINK</span>
+    </div>
+  </div>
+  <div class="theme-row">
+    <div id="theme-gold" class="theme-btn theme-gold" cursor="pointer">
+      <span class="theme-preview">◆</span>
+      <span class="theme-name">GOLDEN</span>
+    </div>
+    <div id="theme-purple" class="theme-btn theme-purple" cursor="pointer">
+      <span class="theme-preview">◆</span>
+      <span class="theme-name">PURPLE HAZE</span>
+    </div>
+  </div>
+  <div id="back-btn" class="back-btn" cursor="pointer">← BACK</div>
+</div>

@@ -65,6 +65,12 @@
   <button id="achievements-btn" class="menu-button" cursor="pointer">
     <span class="btn-text">ACHIEVEMENTS</span>
   </button>
+  <button id="tournament-btn" class="menu-button" cursor="pointer">
+    <span class="btn-text">🏆 TOURNAMENT</span>
+  </button>
+  <button id="themes-btn" class="menu-button" cursor="pointer">
+    <span class="btn-text">🎨 THEMES</span>
+  </button>
   <button id="help-btn" class="menu-button" cursor="pointer">
     <span class="btn-text">HELP</span>
   </button>

@@ -16,6 +16,8 @@ import { AudioManager } from './audio';
 import { CameraController } from './camera';
 import type { SpinSystem } from './spin';
 import type { AchievementManager, Achievement } from './achievements';
+import type { ThemeManager } from './themes';
+import type { TournamentManager } from './tournament';
 
 type UIKitElement = { text: { value: string }; addEventListener: (event: string, cb: () => void) => void } | null;
 
@@ -38,6 +40,8 @@ interface UIEntities {
   achievementToastEntity: any;
   achievementsEntity: any;
   helpEntity: any;
+  themesEntity: any;
+  tournamentEntity: any;
 }
 
 export interface UISystem {
@@ -46,9 +50,11 @@ export interface UISystem {
   updateCameraMode: (mode: string) => void;
   updateSpin: (spinLabel: string) => void;
   showAchievement: (achievement: Achievement) => void;
+  updateTournament: (tournament: TournamentManager) => void;
+  updateThemeLabel: (name: string) => void;
 }
 
-export function setupUI(world: World, game: GameManager, audio: AudioManager, cameraCtrl?: CameraController, spinSystem?: SpinSystem): UISystem {
+export function setupUI(world: World, game: GameManager, audio: AudioManager, cameraCtrl?: CameraController, spinSystem?: SpinSystem, themeManager?: ThemeManager): UISystem {
   const entities: UIEntities = {} as any;
 
   // ---- TITLE SCREEN (world-space, in front of table) ----
@@ -173,6 +179,26 @@ export function setupUI(world: World, game: GameManager, audio: AudioManager, ca
   });
   entities.helpEntity = helpEntity;
 
+  // ---- THEMES PANEL (world-space) ----
+  const themesEntity = world.createTransformEntity(undefined, { persistent: true });
+  themesEntity.object3D.position.set(0, 1.6, -1.8);
+  themesEntity.addComponent(PanelUI, {
+    config: '/ui/themes.json',
+    maxWidth: 1.0,
+    maxHeight: 1.0,
+  });
+  entities.themesEntity = themesEntity;
+
+  // ---- TOURNAMENT BRACKET (world-space) ----
+  const tournamentEntity = world.createTransformEntity(undefined, { persistent: true });
+  tournamentEntity.object3D.position.set(0, 1.6, -1.8);
+  tournamentEntity.addComponent(PanelUI, {
+    config: '/ui/tournament.json',
+    maxWidth: 1.0,
+    maxHeight: 1.4,
+  });
+  entities.tournamentEntity = tournamentEntity;
+
   // ---- MESSAGE TOAST (head-following, top center) ----
   const messageEntity = world.createTransformEntity(undefined, { persistent: true });
   messageEntity.addComponent(PanelUI, {
@@ -222,7 +248,7 @@ export function setupUI(world: World, game: GameManager, audio: AudioManager, ca
   entities.cameraEntity = cameraEntity;
 
   // Wire up button events after panel initialization
-  setTimeout(() => wireEvents(entities, game, audio, cameraCtrl), 500);
+  setTimeout(() => wireEvents(entities, game, audio, cameraCtrl, themeManager), 500);
 
   let lastState: GameState | null = null;
   let achievementToastTimer = 0;
@@ -243,6 +269,8 @@ export function setupUI(world: World, game: GameManager, audio: AudioManager, ca
     setVisible(entities.leaderboardEntity, state === 'leaderboard');
     setVisible(entities.achievementsEntity, state === 'achievements' as GameState);
     setVisible(entities.helpEntity, state === 'help' as GameState);
+    setVisible(entities.themesEntity, state === 'themes' as GameState);
+    setVisible(entities.tournamentEntity, state === 'tournament' as GameState);
     setVisible(entities.messageEntity, game.message !== '');
     setVisible(entities.cameraEntity, isPlaying);
 
@@ -298,6 +326,11 @@ export function setupUI(world: World, game: GameManager, audio: AudioManager, ca
       updateAchievementsPanel(entities.achievementsEntity, game.achievements);
     }
 
+    // Update tournament panel
+    if (state === 'tournament' as GameState) {
+      updateTournament(game.tournament);
+    }
+
     lastState = state;
   }
 
@@ -329,7 +362,53 @@ export function setupUI(world: World, game: GameManager, audio: AudioManager, ca
     achievementToastTimer = 4.0; // Show for 4 seconds
   }
 
-  return { update, updatePause, updateCameraMode, updateSpin, showAchievement };
+  function updateTournament(tournament: TournamentManager) {
+    const doc = getDoc(entities.tournamentEntity);
+    if (!doc) return;
+
+    const state = tournament.state;
+    setText(doc.getElementById('round-label'), tournament.getRoundName());
+
+    if (state.champion) {
+      setText(doc.getElementById('tourn-status'), `🏆 Champion: ${state.champion}`);
+    } else if (state.eliminated) {
+      setText(doc.getElementById('tourn-status'), 'Eliminated! Better luck next time.');
+    } else {
+      const opponent = tournament.getPlayerOpponent();
+      setText(doc.getElementById('tourn-status'), opponent ? `Next: vs ${opponent} (${tournament.getCurrentDifficulty()})` : '8-Player Single Elimination');
+    }
+
+    // Update bracket display
+    const prefixes = ['qf', 'sf', 'fi'];
+    for (let r = 0; r < state.matches.length; r++) {
+      for (let m = 0; m < state.matches[r].length; m++) {
+        const match = state.matches[r][m];
+        const p1El = doc.getElementById(`${prefixes[r]}-${m}a`);
+        const p2El = doc.getElementById(`${prefixes[r]}-${m}b`);
+        if (p1El) {
+          const isPlayer = match.player1 === state.playerName;
+          const isWinner = match.winner === match.player1;
+          const prefix = isWinner ? '★ ' : isPlayer ? '▶ ' : '  ';
+          setText(p1El, prefix + match.player1);
+        }
+        if (p2El) {
+          const isPlayer = match.player2 === state.playerName;
+          const isWinner = match.winner === match.player2;
+          const prefix = isWinner ? '★ ' : isPlayer ? '▶ ' : '  ';
+          setText(p2El, prefix + match.player2);
+        }
+      }
+    }
+  }
+
+  function updateThemeLabel(name: string) {
+    const doc = getDoc(entities.themesEntity);
+    if (doc) {
+      setText(doc.getElementById('current-theme'), `Current: ${name}`);
+    }
+  }
+
+  return { update, updatePause, updateCameraMode, updateSpin, showAchievement, updateTournament, updateThemeLabel };
 }
 
 function setVisible(entity: any, visible: boolean) {
@@ -342,7 +421,7 @@ function getDoc(entity: any): UIKitDocument | undefined {
   return entity?.getValue?.(PanelDocument, 'document') as UIKitDocument | undefined;
 }
 
-function wireEvents(entities: UIEntities, game: GameManager, audio: AudioManager, cameraCtrl?: CameraController) {
+function wireEvents(entities: UIEntities, game: GameManager, audio: AudioManager, cameraCtrl?: CameraController, themeManager?: ThemeManager) {
   // Title buttons
   const titleDoc = getDoc(entities.titleEntity);
   if (titleDoc) {
@@ -351,6 +430,11 @@ function wireEvents(entities: UIEntities, game: GameManager, audio: AudioManager
     titleDoc.getElementById('leaderboard-btn')?.addEventListener('click', () => { game.state = 'leaderboard'; });
     titleDoc.getElementById('achievements-btn')?.addEventListener('click', () => { game.state = 'achievements' as any; });
     titleDoc.getElementById('help-btn')?.addEventListener('click', () => { game.state = 'help' as any; });
+    titleDoc.getElementById('tournament-btn')?.addEventListener('click', () => {
+      game.tournament.startTournament();
+      game.state = 'tournament' as any;
+    });
+    titleDoc.getElementById('themes-btn')?.addEventListener('click', () => { game.state = 'themes' as any; });
   }
 
   // Mode select buttons
@@ -386,11 +470,21 @@ function wireEvents(entities: UIEntities, game: GameManager, audio: AudioManager
     gameOverDoc.getElementById('replay-btn')?.addEventListener('click', () => {
       if (game.hasMatchPending()) {
         game.continueMatch();
+      } else if (game.isTournamentGame || game.tournament.isActive()) {
+        game.state = 'tournament' as any;
       } else {
         game.startGame(game.mode);
       }
     });
-    gameOverDoc.getElementById('menu-btn')?.addEventListener('click', () => game.showTitle());
+    gameOverDoc.getElementById('watch-replay-btn')?.addEventListener('click', () => {
+      game.startReplay();
+    });
+    gameOverDoc.getElementById('menu-btn')?.addEventListener('click', () => {
+      if (game.tournament.state.active) {
+        game.tournament.reset();
+      }
+      game.showTitle();
+    });
   }
 
   // Settings buttons
@@ -441,6 +535,30 @@ function wireEvents(entities: UIEntities, game: GameManager, audio: AudioManager
   const helpDoc = getDoc(entities.helpEntity);
   if (helpDoc) {
     helpDoc.getElementById('back-btn')?.addEventListener('click', () => game.showTitle());
+  }
+
+  // Tournament panel buttons
+  const tournDoc = getDoc(entities.tournamentEntity);
+  if (tournDoc) {
+    tournDoc.getElementById('play-match-btn')?.addEventListener('click', () => {
+      if (game.tournament.isActive()) {
+        game.startTournamentGame();
+      }
+    });
+    tournDoc.getElementById('back-btn')?.addEventListener('click', () => {
+      game.tournament.reset();
+      game.showTitle();
+    });
+  }
+
+  // Theme panel buttons
+  const themeDoc = getDoc(entities.themesEntity);
+  if (themeDoc && themeManager) {
+    themeDoc.getElementById('theme-cyan')?.addEventListener('click', () => themeManager.setTheme('cyan'));
+    themeDoc.getElementById('theme-pink')?.addEventListener('click', () => themeManager.setTheme('pink'));
+    themeDoc.getElementById('theme-gold')?.addEventListener('click', () => themeManager.setTheme('gold'));
+    themeDoc.getElementById('theme-purple')?.addEventListener('click', () => themeManager.setTheme('purple'));
+    themeDoc.getElementById('back-btn')?.addEventListener('click', () => game.showTitle());
   }
 }
 
@@ -498,6 +616,13 @@ function updateGameOver(entity: any, game: GameManager) {
 
   if (game.mode === 'trickshot') {
     setText(doc.getElementById('winner-text'), 'TRICKS COMPLETE!');
+  } else if (game.tournament.state.active) {
+    const result = game.tournament.state.eliminated
+      ? 'ELIMINATED FROM TOURNAMENT'
+      : game.tournament.state.champion
+      ? `🏆 ${game.tournament.state.champion} IS CHAMPION!`
+      : game.message || 'GAME OVER';
+    setText(doc.getElementById('winner-text'), result);
   } else {
     setText(doc.getElementById('winner-text'), game.message || 'GAME OVER');
   }
