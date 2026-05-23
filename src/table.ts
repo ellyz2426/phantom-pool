@@ -147,6 +147,9 @@ export function createTable(world: World): Group {
   // Edge glow strips along table perimeter
   createEdgeGlow(table);
 
+  // Hanging light fixture above table
+  createLightFixture(table);
+
   world.scene.add(table);
   return table;
 }
@@ -307,4 +310,106 @@ function createEdgeGlow(table: Group) {
     strip.position.set(0, TABLE_HEIGHT, end * (HL + RAIL_WIDTH + 0.05));
     table.add(strip);
   }
+}
+
+function createLightFixture(table: Group) {
+  const fixture = new Group();
+  fixture.name = 'light-fixture';
+
+  // Horizontal bar (long, above table)
+  const barGeo = new BoxGeometry(0.04, 0.02, TABLE_LENGTH * 0.7);
+  const barMat = new MeshStandardMaterial({
+    color: 0x0a0a15,
+    metalness: 0.9,
+    roughness: 0.2,
+    emissive: new Color(0x001122),
+    emissiveIntensity: 0.3,
+  });
+  const bar = new Mesh(barGeo, barMat);
+  bar.position.set(0, 2.3, 0);
+  fixture.add(bar);
+
+  // Wireframe edges on bar
+  const barEdges = new EdgesGeometry(barGeo);
+  const barWire = new LineSegments(barEdges, new LineBasicMaterial({
+    color: 0x00ddff,
+    transparent: true,
+    opacity: 0.5,
+  }));
+  barWire.position.copy(bar.position);
+  fixture.add(barWire);
+
+  // Hanging cable to ceiling
+  const cableGeo = new CylinderGeometry(0.004, 0.004, 1.7, 4);
+  const cableMat = new MeshBasicMaterial({
+    color: 0x333344,
+  });
+  const cable = new Mesh(cableGeo, cableMat);
+  cable.position.set(0, 3.15, 0);
+  fixture.add(cable);
+
+  // 3 downward shade cones
+  const shadePositions = [0, -TABLE_LENGTH * 0.22, TABLE_LENGTH * 0.22];
+  for (const z of shadePositions) {
+    // Shade cone (inverted)
+    const shadeGeo = new CylinderGeometry(0.12, 0.04, 0.08, 12, 1, true);
+    const shadeMat = new MeshStandardMaterial({
+      color: 0x0a0a20,
+      metalness: 0.7,
+      roughness: 0.3,
+      emissive: new Color(0x001133),
+      emissiveIntensity: 0.4,
+      side: 2,
+    });
+    const shade = new Mesh(shadeGeo, shadeMat);
+    shade.position.set(0, 2.26, z);
+    fixture.add(shade);
+
+    // Shade wireframe
+    const shadeEdges = new EdgesGeometry(shadeGeo);
+    const shadeWire = new LineSegments(shadeEdges, new LineBasicMaterial({
+      color: 0x00ddff,
+      transparent: true,
+      opacity: 0.4,
+    }));
+    shadeWire.position.copy(shade.position);
+    fixture.add(shadeWire);
+
+    // Glow bulb inside
+    const bulbGeo = new SphereGeometry(0.015, 8, 8);
+    const bulbMat = new MeshBasicMaterial({
+      color: 0x00ddff,
+      transparent: true,
+      opacity: 0.9,
+    });
+    const bulb = new Mesh(bulbGeo, bulbMat);
+    bulb.position.set(0, 2.24, z);
+    fixture.add(bulb);
+
+    // Bulb glow halo
+    const haloGeo = new SphereGeometry(0.04, 8, 8);
+    const haloMat = new MeshBasicMaterial({
+      color: 0x00ddff,
+      transparent: true,
+      opacity: 0.15,
+      blending: AdditiveBlending,
+    });
+    const halo = new Mesh(haloGeo, haloMat);
+    halo.position.set(0, 2.24, z);
+    fixture.add(halo);
+
+    // Downward light cone (visible beam)
+    const beamGeo = new CylinderGeometry(0.01, 0.4, 1.3, 12, 1, true);
+    const beamMat = new MeshBasicMaterial({
+      color: 0x00bbdd,
+      transparent: true,
+      opacity: 0.02,
+      side: 2,
+    });
+    const beam = new Mesh(beamGeo, beamMat);
+    beam.position.set(0, 1.6, z);
+    fixture.add(beam);
+  }
+
+  table.add(fixture);
 }

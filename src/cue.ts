@@ -1,4 +1,3 @@
-// Cue Stick - physical cue with charge-and-release shooting
 import {
   World,
   Mesh,
@@ -18,7 +17,7 @@ import {
 } from '@iwsdk/core';
 
 import { BallManager, CUE_BALL_ID, PoolBall } from './balls';
-import { TABLE_HEIGHT, BALL_RADIUS } from './table';
+import { TABLE_HEIGHT, BALL_RADIUS, TABLE_WIDTH, TABLE_LENGTH } from './table';
 import { GameManager } from './game';
 import { AudioManager } from './audio';
 
@@ -27,6 +26,7 @@ const CUE_THICK_RADIUS = 0.012;
 const CUE_TIP_RADIUS = 0.006;
 const MAX_POWER = 8.0;
 const CHARGE_RATE = 4.0; // power per second
+const GUIDE_LINE_LEN = 2.0;
 
 export class CueStick {
   group: Group;
@@ -34,6 +34,8 @@ export class CueStick {
   tip: Mesh;
   tipGlow: Mesh;
   guideLine: LineSegments;
+  reflectedLine: LineSegments; // Shows predicted bounce direction
+  ghostBallIndicator: Mesh; // Shows where cue ball will be at impact
   powerIndicator: Mesh;
   world: World;
   ballManager: BallManager;
@@ -89,10 +91,10 @@ export class CueStick {
     this.tipGlow.position.z = 0;
     this.group.add(this.tipGlow);
 
-    // Guide line (trajectory preview)
+    // Guide line (trajectory preview from cue ball)
     const lineGeo = new BufferGeometry();
     lineGeo.setAttribute('position', new Float32BufferAttribute([
-      0, 0, 0, 0, 0, -2
+      0, 0, 0, 0, 0, -GUIDE_LINE_LEN
     ], 3));
     this.guideLine = new LineSegments(lineGeo, new LineBasicMaterial({
       color: 0x00ffcc,
@@ -100,6 +102,31 @@ export class CueStick {
       opacity: 0.4,
     }));
     this.group.add(this.guideLine);
+
+    // Reflected trajectory line (after hitting a ball)
+    const refLineGeo = new BufferGeometry();
+    refLineGeo.setAttribute('position', new Float32BufferAttribute([
+      0, 0, 0, 0, 0, 0
+    ], 3));
+    this.reflectedLine = new LineSegments(refLineGeo, new LineBasicMaterial({
+      color: 0xffaa00,
+      transparent: true,
+      opacity: 0.25,
+    }));
+    this.reflectedLine.visible = false;
+    world.scene.add(this.reflectedLine);
+
+    // Ghost ball indicator at predicted impact point
+    const ghostGeo = new SphereGeometry(BALL_RADIUS, 8, 8);
+    const ghostMat = new MeshBasicMaterial({
+      color: 0x00ffcc,
+      transparent: true,
+      opacity: 0.15,
+      blending: AdditiveBlending,
+    });
+    this.ghostBallIndicator = new Mesh(ghostGeo, ghostMat);
+    this.ghostBallIndicator.visible = false;
+    world.scene.add(this.ghostBallIndicator);
 
     // Power indicator (bar that grows during charge)
     const powerGeo = new CylinderGeometry(0.003, 0.003, 0.001, 8);
@@ -128,6 +155,8 @@ export class CueStick {
     this.isVisible = false;
     this.isCharging = false;
     this.power = 0;
+    this.reflectedLine.visible = false;
+    this.ghostBallIndicator.visible = false;
   }
 
   setAimAngle(angle: number): void {
@@ -185,6 +214,59 @@ export class CueStick {
     this.setAimAngle(this.aimAngle);
   }
 
+  // Predict first ball collision along aim trajectory
+  private predictCollision(): { hitBall: PoolBall; hitPoint: Vector3; distance: number; reflectDir: Vector3 } | null {
+    const cueBall = this.ballManager.getCueBall();
+    if (!cueBall || cueBall.pocketed) return null;
+
+    const rayOrigin = cueBall.position.clone();
+    const rayDir = new Vector3(-this.aimDir.x, 0, -this.aimDir.z).normalize();
+
+    let closest: { hitBall: PoolBall; hitPoint: Vector3; distance: number; reflectDir: Vector3 } | null = null;
+    let closestDist = Infinity;
+
+    for (const ball of this.ballManager.getActiveBalls()) {
+      if (ball.id === CUE_BALL_ID || ball.pocketed) continue;
+
+      // Ray-sphere intersection (2D, on table plane)
+      const oc = new Vector3(
+        rayOrigin.x - ball.position.x,
+        0,
+        rayOrigin.z - ball.position.z
+      );
+      const a = rayDir.x * rayDir.x + rayDir.z * rayDir.z;
+      const b = 2 * (oc.x * rayDir.x + oc.z * rayDir.z);
+      const c = oc.x * oc.x + oc.z * oc.z - (BALL_RADIUS * 2) * (BALL_RADIUS * 2);
+      const discriminant = b * b - 4 * a * c;
+
+      if (discriminant >= 0) {
+        const t = (-b - Math.sqrt(discriminant)) / (2 * a);
+        if (t > 0.01 && t < closestDist) {
+          closestDist = t;
+          const hitPoint = new Vector3(
+            rayOrigin.x + rayDir.x * t,
+            rayOrigin.y,
+            rayOrigin.z + rayDir.z * t
+          );
+
+          // Calculate reflected direction for target ball
+          const normal = new Vector3(
+            ball.position.x - hitPoint.x,
+            0,
+            ball.position.z - hitPoint.z
+          ).normalize();
+
+          // Target ball goes in the normal direction
+          const reflectDir = normal.clone();
+
+          closest = { hitBall: ball, hitPoint, distance: t, reflectDir };
+        }
+      }
+    }
+
+    return closest;
+  }
+
   update(dt: number, world: World): void {
     if (!this.isVisible) return;
 
@@ -222,8 +304,8 @@ export class CueStick {
       (this.tipGlow.material as MeshBasicMaterial).opacity = 0.2 + ratio * 0.5;
     }
 
-    // Update guide line (show trajectory from cue ball in aim direction)
-    const lineLen = 1.5;
+    // Update guide line
+    const lineLen = GUIDE_LINE_LEN;
     const lineGeo = this.guideLine.geometry;
     const positions = lineGeo.attributes.position;
     const cueBallRelX = cueBall.position.x - this.group.position.x;
@@ -233,5 +315,35 @@ export class CueStick {
     (positions.array as Float32Array)[3] = cueBallRelX - this.aimDir.x * lineLen;
     (positions.array as Float32Array)[5] = cueBallRelZ - this.aimDir.z * lineLen;
     positions.needsUpdate = true;
+
+    // Predict collision and show ghost ball + reflected trajectory
+    const prediction = this.predictCollision();
+    if (prediction && prediction.distance < GUIDE_LINE_LEN) {
+      this.ghostBallIndicator.visible = true;
+      this.ghostBallIndicator.position.copy(prediction.hitPoint);
+
+      // Show reflected trajectory (where target ball will go)
+      this.reflectedLine.visible = true;
+      const refGeo = this.reflectedLine.geometry;
+      const refPos = refGeo.attributes.position;
+      const refLen = 0.6;
+      (refPos.array as Float32Array)[0] = prediction.hitBall.position.x;
+      (refPos.array as Float32Array)[1] = prediction.hitBall.position.y;
+      (refPos.array as Float32Array)[2] = prediction.hitBall.position.z;
+      (refPos.array as Float32Array)[3] = prediction.hitBall.position.x + prediction.reflectDir.x * refLen;
+      (refPos.array as Float32Array)[4] = prediction.hitBall.position.y;
+      (refPos.array as Float32Array)[5] = prediction.hitBall.position.z + prediction.reflectDir.z * refLen;
+      refPos.needsUpdate = true;
+
+      // Shorten guide line to collision point
+      const relHitX = prediction.hitPoint.x - this.group.position.x;
+      const relHitZ = prediction.hitPoint.z - this.group.position.z;
+      (positions.array as Float32Array)[3] = relHitX;
+      (positions.array as Float32Array)[5] = relHitZ;
+      positions.needsUpdate = true;
+    } else {
+      this.ghostBallIndicator.visible = false;
+      this.reflectedLine.visible = false;
+    }
   }
 }
